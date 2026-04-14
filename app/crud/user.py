@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.user import User
 from app.schemas.user import UserCreate
+from app.core.security import gerar_hash_senha
 
 
 def criar_usuario(db: Session, user: UserCreate):
@@ -9,10 +10,12 @@ def criar_usuario(db: Session, user: UserCreate):
     if usuario_existente:
         return None
 
+    senha_hash = gerar_hash_senha(user.senha)
+
     novo_usuario = User(
         nome=user.nome,
         email=user.email,
-        senha=user.senha,
+        senha=senha_hash,
         tipo_usuario=user.tipo_usuario
     )
 
