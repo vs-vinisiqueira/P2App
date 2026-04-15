@@ -34,3 +34,7 @@ def criar_usuario(db: Session, user: UserCreate):
 
 def listar_usuarios(db: Session, limit: int = 100, offset: int = 0):
     return db.query(User).offset(offset).limit(limit).all()
+
+
+def obter_usuario_por_email(db: Session, email: str):
+    return db.query(User).filter(User.email == email).first()
