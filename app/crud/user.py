@@ -1,4 +1,6 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+
 from app.models.user import User
 from app.schemas.user import UserCreate
 from app.core.security import gerar_hash_senha
@@ -19,12 +21,16 @@ def criar_usuario(db: Session, user: UserCreate):
         tipo_usuario=user.tipo_usuario
     )
 
-    db.add(novo_usuario)
-    db.commit()
-    db.refresh(novo_usuario)
+    try:
+        db.add(novo_usuario)
+        db.commit()
+        db.refresh(novo_usuario)
+    except IntegrityError:
+        db.rollback()
+        return None
 
     return novo_usuario
 
 
-def listar_usuarios(db: Session):
-    return db.query(User).all()
+def listar_usuarios(db: Session, limit: int = 100, offset: int = 0):
+    return db.query(User).offset(offset).limit(limit).all()
