@@ -3,13 +3,19 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import jwt
+from dotenv import load_dotenv
 from passlib.context import CryptContext
+
+load_dotenv()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "p2app-dev-secret-change-me")
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+
+if not JWT_SECRET_KEY:
+    raise ValueError("A variavel JWT_SECRET_KEY nao foi definida no arquivo .env")
 
 
 def gerar_hash_senha(senha: str) -> str:
