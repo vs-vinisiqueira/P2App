@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
 from app.database import Base
+from app.models import chamado  # noqa: F401
 from app.models import user  # noqa: F401
 
 load_dotenv()
