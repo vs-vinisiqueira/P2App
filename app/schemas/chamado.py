@@ -10,6 +10,10 @@ class ChamadoCreate(BaseModel):
     prioridade: Literal["baixa", "media", "alta"]
 
 
+class ChamadoStatusUpdate(BaseModel):
+    status: Literal["aberto", "em_andamento", "concluido", "cancelado"]
+
+
 class ChamadoResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
