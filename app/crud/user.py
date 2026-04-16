@@ -18,7 +18,8 @@ def criar_usuario(db: Session, user: UserCreate):
         nome=user.nome,
         email=user.email,
         senha=senha_hash,
-        tipo_usuario=user.tipo_usuario
+        tipo_usuario=user.tipo_usuario,
+        role="user",
     )
 
     try:
