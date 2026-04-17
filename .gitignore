@@ -11,6 +11,9 @@ __pycache__/
 # VS Code
 .vscode/
 
+# Obsidian local config
+docs/.obsidian/
+
 # Sistema operacional
 .DS_Store
 Thumbs.db

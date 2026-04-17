@@ -16,13 +16,21 @@ from app.schemas.chamado import ChamadoCreate, ChamadoResponse, ChamadoStatusUpd
 router = APIRouter(prefix="/chamados", tags=["Chamados"])
 
 
+def _is_admin(user: User) -> bool:
+    return user.role == "admin"
+
+
+def _is_cliente(user: User) -> bool:
+    return user.tipo_usuario == "cliente"
+
+
 @router.post("/", response_model=ChamadoResponse, status_code=status.HTTP_201_CREATED)
 def criar(
     chamado: ChamadoCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    if current_user.tipo_usuario != "cliente":
+    if not _is_cliente(current_user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Apenas clientes podem criar chamados",
@@ -38,10 +46,10 @@ def listar(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    if current_user.tipo_usuario == "admin":
+    if _is_admin(current_user):
         return listar_todos_chamados(db, limit=limit, offset=offset)
 
-    if current_user.tipo_usuario == "cliente":
+    if _is_cliente(current_user):
         return listar_chamados_por_cliente(
             db,
             cliente_id=current_user.id,
@@ -68,10 +76,10 @@ def obter(
             detail="Chamado nao encontrado",
         )
 
-    if current_user.tipo_usuario == "admin":
+    if _is_admin(current_user):
         return chamado
 
-    if current_user.tipo_usuario == "cliente" and chamado.cliente_id == current_user.id:
+    if _is_cliente(current_user) and chamado.cliente_id == current_user.id:
         return chamado
 
     raise HTTPException(
@@ -87,7 +95,7 @@ def atualizar_status(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    if current_user.tipo_usuario != "admin":
+    if not _is_admin(current_user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Apenas administradores podem atualizar status de chamados",

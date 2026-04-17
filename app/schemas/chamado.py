@@ -1,17 +1,28 @@
 from datetime import datetime
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, StringConstraints
+
+ChamadoPrioridade = Literal["baixa", "media", "alta"]
+ChamadoStatus = Literal["aberto", "em_andamento", "concluido", "cancelado"]
+TituloChamado = Annotated[
+    str,
+    StringConstraints(strip_whitespace=True, min_length=2, max_length=150),
+]
+DescricaoChamado = Annotated[
+    str,
+    StringConstraints(strip_whitespace=True, min_length=1),
+]
 
 
 class ChamadoCreate(BaseModel):
-    titulo: str = Field(min_length=2, max_length=150)
-    descricao: str = Field(min_length=1)
-    prioridade: Literal["baixa", "media", "alta"]
+    titulo: TituloChamado
+    descricao: DescricaoChamado
+    prioridade: ChamadoPrioridade
 
 
 class ChamadoStatusUpdate(BaseModel):
-    status: Literal["aberto", "em_andamento", "concluido", "cancelado"]
+    status: ChamadoStatus
 
 
 class ChamadoResponse(BaseModel):
@@ -20,7 +31,7 @@ class ChamadoResponse(BaseModel):
     id: int
     titulo: str
     descricao: str
-    status: str
-    prioridade: str
+    status: ChamadoStatus
+    prioridade: ChamadoPrioridade
     cliente_id: int
     created_at: datetime
