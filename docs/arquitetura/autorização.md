@@ -1,3 +1,0 @@
-- Sistema baseado em roles (user/admin)
-- Middleware: require_admin
-- Rotas protegidas por nível de acesso

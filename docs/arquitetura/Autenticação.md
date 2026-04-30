@@ -1,4 +1,0 @@
-- POST /auth/login
-- Busca usuário por email
-- Verifica senha (bcrypt)
-- Gera JWT com sub = email
