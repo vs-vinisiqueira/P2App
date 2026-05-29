@@ -1,279 +1,438 @@
 # P2App Backend
 
-API backend desenvolvida com FastAPI para gerenciamento de usuários, autenticação e chamados, com arquitetura modular e preparada para expansão futura.
+API backend em FastAPI para gestao de atendimentos tecnicos e chamados. O projeto implementa autenticacao JWT, controle de acesso por perfil, persistencia em PostgreSQL com SQLAlchemy e Alembic, e uma organizacao modular pensada para manutencao e expansao.
 
-## 📌 Sobre o projeto
+## Status do projeto
 
-O P2App é um sistema backend voltado para gestão de usuários e autenticação, com foco em escalabilidade, organização de código e boas práticas de desenvolvimento.
+O P2App e um projeto de portfolio backend em evolucao. A aplicacao ja possui cadastro publico de usuarios clientes, login com JWT, rotas protegidas, controle de acesso administrativo, modulo de tickets/chamados, migrations com Alembic, testes automatizados com Pytest e configuracao Docker para API com PostgreSQL.
 
-Atualmente o sistema possui:
+## Funcionalidades
 
-- Cadastro de usuários
-- Autenticação com JWT
-- Controle de acesso por tipo de usuário
-- Gerenciamento inicial de chamados
-- Estrutura organizada para crescimento do projeto
+- Cadastro publico de usuarios clientes.
+- Login com JWT usando email e senha.
+- Protecao de rotas autenticadas com token Bearer.
+- Controle de acesso por `role` e `tipo_usuario`.
+- Consulta do usuario autenticado em `/auth/me`.
+- Listagem administrativa de usuarios em `/users/`.
+- Criacao, listagem, consulta, atualizacao e exclusao de tickets em `/tickets`.
+- Rotas legadas/compatibilidade em portugues para chamados em `/chamados`.
+- Hash de senha com Passlib/bcrypt.
+- Persistencia com SQLAlchemy ORM.
+- Migrations versionadas com Alembic.
+- Configuracao via variaveis de ambiente.
+- Testes automatizados com Pytest usando banco SQLite em memoria.
+- Dockerfile e Docker Compose para executar API e PostgreSQL.
 
-## 🚀 Tecnologias utilizadas
+## Tecnologias utilizadas
 
-- Python
-- FastAPI
-- PostgreSQL
-- SQLAlchemy
-- Alembic
-- Pydantic
-- JWT (JSON Web Token)
-- Passlib (hash de senha)
+| Tecnologia | Uso no projeto |
+| --- | --- |
+| Python | Linguagem principal da API |
+| FastAPI | Framework web e documentacao OpenAPI |
+| PostgreSQL | Banco de dados principal configurado por `DATABASE_URL` |
+| SQLAlchemy | ORM e conexao com banco |
+| Alembic | Controle de migrations |
+| Pydantic | Validacao e serializacao de dados |
+| PyJWT | Criacao e validacao de tokens JWT |
+| Passlib/bcrypt | Hash e verificacao de senhas |
+| Uvicorn | Servidor ASGI para execucao local |
+| Pytest | Testes automatizados |
+| python-dotenv | Carregamento de variaveis do arquivo `.env` |
 
-## 📂 Estrutura do projeto
+## Arquitetura do projeto
+
+```text
+P2App/
+├── app/
+│   ├── core/
+│   ├── crud/
+│   ├── models/
+│   ├── routes/
+│   ├── schemas/
+│   ├── api_deps.py
+│   ├── database.py
+│   └── main.py
+├── alembic/
+│   └── versions/
+├── docs/
+├── scripts/
+├── tests/
+├── .dockerignore
+├── .env.example
+├── alembic.ini
+├── docker-compose.yml
+├── Dockerfile
+├── pytest.ini
+├── requirements.txt
+└── README.md
+```
+
+| Caminho | Responsabilidade |
+| --- | --- |
+| `app/main.py` | Cria a aplicacao FastAPI e registra os routers de `auth`, `chamado`, `ticket` e `user`. |
+| `app/database.py` | Configura engine, sessao SQLAlchemy e dependencia `get_db`. |
+| `app/api_deps.py` | Reexporta dependencias de autenticacao para compatibilidade/importacao centralizada. |
+| `app/core/` | Seguranca JWT, hash de senha, dependencia de usuario autenticado e regras de autorizacao. |
+| `app/crud/` | Operacoes de persistencia para usuarios e tickets. |
+| `app/models/` | Models SQLAlchemy `User`, `Ticket` e alias `Chamado`. |
+| `app/routes/` | Endpoints HTTP da API. |
+| `app/schemas/` | Schemas Pydantic de entrada e resposta. |
+| `alembic/` | Ambiente e historico de migrations do banco. |
+| `docs/` | Anotacoes de arquitetura, decisoes tecnicas e tarefas do projeto. |
+| `tests/` | Testes automatizados de autenticacao, usuarios e tickets. |
+| `scripts/` | Script de entrypoint Docker para aguardar o banco antes de iniciar a API. |
+
+## Pre-requisitos
+
+- Git.
+- Python compativel com o projeto. O Dockerfile usa `python:3.14-slim`.
+- PostgreSQL instalado e rodando, caso execute sem Docker.
+- Ambiente virtual Python recomendado.
+- Docker e Docker Compose, caso prefira executar por containers.
+
+## Configuracao do ambiente
+
+### Windows PowerShell
+
+```powershell
+git clone https://github.com/vs-vinisiqueira/P2App.git
+cd P2App
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+copy .env.example .env
+```
+
+### Linux/macOS
 
 ```bash
-app/
- core/        # Configurações, segurança e autorização
- routes/      # Rotas da API
- schemas/     # Validação de dados (Pydantic)
- crud/        # Operações com banco de dados
- models/      # Modelos do banco (SQLAlchemy)
- database.py  # Conexão com o banco
- main.py      # Entrada da aplicação
+git clone https://github.com/vs-vinisiqueira/P2App.git
+cd P2App
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
 ```
 
-## ⚙️ Configuração do ambiente
+Depois de copiar o `.env.example`, ajuste `DATABASE_URL`, `POSTGRES_PASSWORD` e `JWT_SECRET_KEY` conforme seu ambiente local.
 
-Crie e ative um ambiente virtual:
+## Variaveis de ambiente
 
-```powershell
-python -m venv venv
-```
+| Variavel | Descricao |
+| --- | --- |
+| `POSTGRES_DB` | Nome do banco usado pelo Docker Compose. |
+| `POSTGRES_USER` | Usuario do PostgreSQL usado pelo Docker Compose. |
+| `POSTGRES_PASSWORD` | Senha do PostgreSQL usada pelo Docker Compose. |
+| `DATABASE_URL` | URL de conexao SQLAlchemy usada pela aplicacao e pelo Alembic. |
+| `JWT_SECRET_KEY` | Chave secreta usada para assinar tokens JWT. |
+| `JWT_ALGORITHM` | Algoritmo JWT. O exemplo usa `HS256`. |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Tempo de expiracao do token em minutos. |
+| `DB_WAIT_TIMEOUT` | Tempo maximo, em segundos, para o entrypoint Docker aguardar o banco. |
 
-Instale as dependências:
+Nunca suba um `.env` real para o GitHub. Troque `JWT_SECRET_KEY` e `POSTGRES_PASSWORD` em qualquer ambiente que nao seja local.
 
-```powershell
-venv\Scripts\python.exe -m pip install -r requirements.txt
-```
-
-Crie um arquivo `.env` na raiz do projeto com base no `.env.example`.
-
-Exemplo:
+Exemplo seguro:
 
 ```env
-DATABASE_URL=postgresql://usuario:senha@localhost:5432/p2app
+POSTGRES_DB=p2app
+POSTGRES_USER=p2app
+POSTGRES_PASSWORD=troque-esta-senha
+DATABASE_URL=postgresql://p2app:troque-esta-senha@localhost:5432/p2app
 JWT_SECRET_KEY=troque-esta-chave-em-producao
 JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
+DB_WAIT_TIMEOUT=30
 ```
 
-## 🗄️ Banco de dados
+## Banco de dados e migrations
 
-O projeto utiliza PostgreSQL com SQLAlchemy e Alembic para controle de migrations.
+O projeto usa Alembic para versionar o schema do banco. Com o `.env` configurado e o PostgreSQL acessivel, aplique as migrations:
 
-Para aplicar as migrations:
-
-```powershell
-venv\Scripts\python.exe -m alembic upgrade head
+```bash
+alembic upgrade head
 ```
 
-## ▶️ Como executar
+Para criar uma nova migration durante evolucao do projeto:
 
-Inicie a API com Uvicorn:
-
-```powershell
-venv\Scripts\python.exe -m uvicorn app.main:app --reload
+```bash
+alembic revision --autogenerate -m "descricao_da_migration"
 ```
 
-A API ficará disponível em:
+Esse comando cria um novo arquivo de migration. Para rodar o projeto inicialmente, use apenas `alembic upgrade head`.
+
+## Executando a API
+
+```bash
+uvicorn app.main:app --reload
+```
+
+URLs locais:
 
 ```text
-http://127.0.0.1:8000
+API: http://localhost:8000
+Swagger UI: http://localhost:8000/docs
+ReDoc: http://localhost:8000/redoc
 ```
 
-## 🧪 Testes automatizados
+## Executando com Docker
 
-Execute a suíte com:
+O repositorio possui `Dockerfile` e `docker-compose.yml` com dois servicos: `api` e `db`. O PostgreSQL usa volume persistente chamado `postgres_data`.
 
-```powershell
-venv\Scripts\python.exe -m pytest
+Subir os containers:
+
+```bash
+docker compose up --build
 ```
 
-Os testes usam SQLite em memória e validam cadastro público, login, rota autenticada, permissões administrativas e escopo de chamados por cliente.
+Rodar migrations dentro do container:
 
-## 📖 Documentação interativa
-
-Após iniciar o servidor, acesse o Swagger:
-
-```text
-http://127.0.0.1:8000/docs
+```bash
+docker compose run --rm api alembic upgrade head
 ```
 
-Também é possível acessar a documentação ReDoc:
+Derrubar os containers:
 
-```text
-http://127.0.0.1:8000/redoc
+```bash
+docker compose down
 ```
 
-## 🔐 Autenticação
+Remover containers e volume do banco:
 
-A autenticação é feita com JWT.
-
-Fluxo básico:
-
-1. Criar um usuário.
-2. Fazer login em `/auth/login`.
-3. Copiar o `access_token` retornado.
-4. Clicar em `Authorize` no Swagger.
-5. Informar o token para acessar rotas protegidas.
-
-O token JWT utiliza o email do usuário como identificador no payload.
-
-## 👥 Tipos de usuário e permissões
-
-O sistema separa tipo de usuário e permissão:
-
-- `tipo_usuario` representa o perfil de negócio.
-- `role` representa permissão de acesso.
-
-Tipos de usuário aceitos:
-
-- `admin`
-- `gerente`
-- `tecnico`
-- `cliente`
-
-Roles aceitas:
-
-- `admin`
-- `user`
-
-No cadastro público, novos usuários são sempre criados com `tipo_usuario="cliente"` e `role="user"`.
-
-Perfis internos devem ser criados apenas por fluxos administrativos protegidos.
-
-## 🔗 Endpoints principais
-
-### Público
-
-```http
-GET /
+```bash
+docker compose down -v
 ```
 
-Verifica se a API está rodando.
+## Testes automatizados
+
+A suite Pytest esta organizada em `tests/test_auth.py`, `tests/test_users.py` e `tests/test_tickets.py`. Os testes substituem a dependencia de banco da API e usam SQLite em memoria.
+
+```bash
+pytest
+```
+
+## Endpoints principais
+
+| Metodo | Rota | Autenticacao | Perfil necessario | Descricao |
+| --- | --- | --- | --- | --- |
+| `GET` | `/` | Nao | Publico | Health check simples da API. |
+| `POST` | `/users/` | Nao | Publico | Cadastra um usuario publico sempre como cliente. |
+| `GET` | `/users/` | Sim | `role="admin"` | Lista usuarios cadastrados. |
+| `POST` | `/auth/login` | Nao | Publico | Autentica usuario e retorna token JWT. |
+| `GET` | `/auth/me` | Sim | Usuario autenticado | Retorna os dados do usuario autenticado. |
+| `POST` | `/tickets` | Sim | Usuario autenticado | Cria ticket para o usuario autenticado. `assigned_to_id` so pode ser definido por suporte/admin. |
+| `GET` | `/tickets` | Sim | Usuario autenticado | Lista tickets. Suporte/admin ve todos; demais usuarios veem apenas os proprios. |
+| `GET` | `/tickets/{ticket_id}` | Sim | Dono do ticket ou suporte/admin | Consulta um ticket por ID. |
+| `PATCH` | `/tickets/{ticket_id}` | Sim | Dono do ticket ou suporte/admin | Atualiza dados do ticket. Somente suporte/admin altera `status` e `assigned_to_id`. |
+| `DELETE` | `/tickets/{ticket_id}` | Sim | Dono do ticket ou suporte/admin | Remove um ticket. |
+| `POST` | `/chamados/` | Sim | `tipo_usuario="cliente"` | Cria chamado usando payload em portugues. |
+| `GET` | `/chamados/` | Sim | Admin ou cliente | Admin lista todos; cliente lista os proprios. |
+| `GET` | `/chamados/{chamado_id}` | Sim | Admin ou cliente dono | Consulta chamado por ID usando resposta em portugues. |
+| `PATCH` | `/chamados/{chamado_id}/status` | Sim | `role="admin"` | Atualiza status do chamado pela rota legada em portugues. |
+
+## Exemplos de uso
+
+### Cadastro de cliente
 
 ```http
 POST /users/
+Content-Type: application/json
 ```
 
-Cria um novo usuário público com perfil `cliente`.
+Request:
+
+```json
+{
+  "nome": "Cliente Teste",
+  "email": "cliente@example.com",
+  "senha": "12345678"
+}
+```
+
+Response `201`:
+
+```json
+{
+  "id": 1,
+  "nome": "Cliente Teste",
+  "email": "cliente@example.com",
+  "tipo_usuario": "cliente",
+  "role": "user"
+}
+```
+
+### Login
 
 ```http
 POST /auth/login
+Content-Type: application/json
 ```
 
-Autentica um usuário e retorna um token JWT.
+Request:
 
-### Autenticado
+```json
+{
+  "email": "cliente@example.com",
+  "senha": "12345678"
+}
+```
+
+Response `200`:
+
+```json
+{
+  "access_token": "SEU_TOKEN_JWT",
+  "token_type": "bearer"
+}
+```
+
+O endpoint tambem aceita `application/x-www-form-urlencoded` com `username` e `password`, formato usado pelo fluxo OAuth2 do Swagger.
+
+### Uso do token JWT
 
 ```http
-GET /auth/me
+Authorization: Bearer SEU_TOKEN_AQUI
 ```
 
-Retorna os dados do usuário autenticado.
-
-### Módulo de chamados
-
-O módulo de chamados está disponível pelas rotas `/tickets`, com criação, listagem, consulta, atualização e exclusão protegidas por JWT. Usuários comuns acessam apenas os próprios chamados; administradores, gerentes e técnicos podem visualizar e atualizar chamados de suporte.
-
-### Administrador
-
-```http
-GET /users/
-```
-
-Lista usuários cadastrados. Requer usuário com perfil `admin`.
-
-### Chamados
+### Criacao de ticket
 
 ```http
 POST /tickets
+Authorization: Bearer SEU_TOKEN_AQUI
+Content-Type: application/json
 ```
 
-Cria chamado para o cliente autenticado.
-
-```http
-GET /tickets
-```
-
-Lista chamados. Admin, gerente e técnico veem todos; usuários comuns veem apenas os próprios.
-
-```http
-GET /tickets/{ticket_id}
-```
-
-Consulta um chamado por ID.
-
-```http
-PATCH /tickets/{ticket_id}
-```
-
-Atualiza um chamado. Usuários comuns não podem alterar status nem responsável.
-
-```http
-DELETE /tickets/{ticket_id}
-```
-
-Remove um chamado.
-
-## 🧪 Como testar pelo Swagger
-
-1. Acesse:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-2. Crie um usuário em `POST /users/`.
-
-Exemplo:
+Request:
 
 ```json
 {
-  "nome": "Usuario Teste",
-  "email": "usuario@email.com",
-  "senha": "12345678"
+  "title": "Notebook sem rede",
+  "description": "Usuario nao consegue acessar a internet",
+  "priority": "high",
+  "category": "infra"
 }
 ```
 
-3. Faça login em `POST /auth/login`.
-
-Exemplo:
+Response `201`:
 
 ```json
 {
-  "email": "usuario@email.com",
-  "senha": "12345678"
+  "id": 1,
+  "title": "Notebook sem rede",
+  "description": "Usuario nao consegue acessar a internet",
+  "status": "open",
+  "priority": "high",
+  "category": "infra",
+  "owner_id": 1,
+  "assigned_to_id": null,
+  "created_at": "2026-05-29T14:00:00Z",
+  "updated_at": "2026-05-29T14:00:00Z"
 }
 ```
 
-4. Copie o `access_token` retornado.
-
-5. Clique em `Authorize` no Swagger e informe as credenciais ou o token JWT.
-
-6. Teste a rota protegida:
+### Criacao de chamado pela rota legada
 
 ```http
-GET /auth/me
+POST /chamados/
+Authorization: Bearer SEU_TOKEN_AQUI
+Content-Type: application/json
 ```
 
-## 🛡️ Segurança
+Request:
 
-- Senhas são armazenadas com hash usando Passlib.
-- Tokens JWT possuem expiração configurável.
-- Rotas protegidas exigem token Bearer válido.
-- Rotas administrativas exigem `role="admin"`.
-- Valores de `tipo_usuario`, `role`, `status` e `prioridade` são validados também no banco.
-- Respostas públicas não expõem senha nem hash.
+```json
+{
+  "titulo": "Impressora sem papel",
+  "descricao": "Setor financeiro precisa de reposicao",
+  "prioridade": "media"
+}
+```
 
-## 📌 Observações
+## Modelos principais
 
-- Configure `JWT_SECRET_KEY` no `.env` antes de executar o projeto.
-- Execute as migrations antes de iniciar a API em um banco novo.
-- O projeto está preparado para receber novos módulos e regras de negócio futuramente.
+### User
+
+Entidade persistida na tabela `users`.
+
+| Campo | Descricao |
+| --- | --- |
+| `id` | Identificador numerico. |
+| `nome` | Nome do usuario, de 2 a 120 caracteres nos schemas. |
+| `email` | Email unico, normalizado para minusculas nos schemas. |
+| `senha` | Hash da senha armazenado no banco. Nao e exposto nas respostas. |
+| `tipo_usuario` | Perfil de negocio: `admin`, `gerente`, `tecnico` ou `cliente`. |
+| `role` | Permissao de acesso: `admin` ou `user`. |
+
+### Ticket/Chamado
+
+Entidade interna `Ticket`, persistida na tabela `chamados`. O alias `Chamado` aponta para o mesmo model.
+
+| Campo | Descricao |
+| --- | --- |
+| `id` | Identificador numerico. |
+| `title` | Titulo do ticket, de 2 a 150 caracteres. |
+| `description` | Descricao do atendimento. |
+| `status` | `open`, `in_progress`, `resolved` ou `closed`. |
+| `priority` | `low`, `medium`, `high` ou `critical`. |
+| `category` | Categoria opcional, de 2 a 80 caracteres quando informada. |
+| `owner_id` | Usuario dono do ticket. |
+| `assigned_to_id` | Usuario responsavel pelo atendimento, opcional. |
+| `created_at` | Data de criacao. |
+| `updated_at` | Data da ultima atualizacao. |
+
+As rotas `/chamados` traduzem valores em portugues para os valores internos do ticket, por exemplo `aberto` para `open` e `alta` para `high`.
+
+## Controle de acesso
+
+- Usuarios criados pelo endpoint publico `POST /users/` sempre recebem `tipo_usuario="cliente"` e `role="user"`.
+- `tipo_usuario` representa o perfil de negocio: `admin`, `gerente`, `tecnico` ou `cliente`.
+- `role` representa permissao de acesso ampla: `admin` ou `user`.
+- `GET /users/` exige `role="admin"`.
+- Em `/tickets`, suporte e administracao sao definidos por `role="admin"` ou `tipo_usuario` igual a `gerente` ou `tecnico`.
+- Em `/tickets`, usuarios comuns acessam apenas tickets proprios.
+- Em `/tickets`, somente suporte/admin pode alterar `status` e `assigned_to_id`.
+- Em `/chamados`, a regra legada permite criacao apenas por clientes e atualizacao de status apenas por admin.
+
+## Tratamento de erros
+
+| Status | Quando ocorre |
+| --- | --- |
+| `401 Unauthorized` | Token ausente/invalido ou login com credenciais invalidas. |
+| `403 Forbidden` | Usuario autenticado sem permissao para a acao solicitada. |
+| `404 Not Found` | Ticket/chamado nao encontrado. |
+| `409 Conflict` | Tentativa de cadastrar email ja existente. |
+| `422 Unprocessable Entity` | Payload invalido segundo os schemas Pydantic. |
+
+## Qualidade tecnica
+
+- Arquitetura modular com separacao entre rotas, schemas, models e CRUD.
+- SQLAlchemy ORM para modelagem e persistencia.
+- Alembic para evolucao versionada do banco.
+- Pydantic para validacao de entrada e formato de resposta.
+- Hash de senha com Passlib/bcrypt.
+- Autenticacao JWT com expiracao configuravel.
+- Configuracao via variaveis de ambiente.
+- Testes automatizados cobrindo autenticacao, usuarios e tickets.
+- Docker Compose com servico de API, PostgreSQL, healthcheck e volume persistente.
+- Documentacao tecnica adicional em `docs/`, com notas de arquitetura, seguranca, autorizacao e decisoes de implementacao.
+
+## Proximos passos
+
+- Criar seed ou fluxo administrativo para cadastro inicial de usuarios admin.
+- Adicionar CI com GitHub Actions.
+- Melhorar a documentacao Swagger com descricoes mais detalhadas por endpoint.
+- Preparar deploy em ambiente de nuvem.
+- Adicionar prints do Swagger ou exemplos visuais ao README.
+- Aumentar cobertura de testes.
+- Padronizar responses e payloads de erro.
+- Evoluir filtros, paginacao e busca dos tickets.
+
+## Observacoes tecnicas
+
+- A entidade interna atual e `Ticket`, mas a tabela no banco permanece `chamados` por historico de evolucao do projeto.
+- As rotas `/tickets` e `/chamados` convivem no `app/main.py`; `/chamados` funciona como camada de compatibilidade em portugues e possui regras de permissao mais restritas.
+- O cadastro publico nao cria usuarios admin. Para usar rotas administrativas em um ambiente novo, ainda e necessario criar um usuario admin por um processo externo ao endpoint publico.
+- As migrations antigas criam chamados com campos em portugues e a migration mais recente migra para o modelo interno de tickets em ingles. Em bancos novos, rode sempre `alembic upgrade head`.
+
+## Licenca
+
+Este projeto ainda nao possui uma licenca definida.
