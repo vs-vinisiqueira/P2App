@@ -7,4 +7,4 @@ Implementação:
 - Proteção de rotas críticas
 
 Observação:
-- Ainda falta validar fluxo completo (testes)
+- Fluxo principal validado por testes automatizados com pytest

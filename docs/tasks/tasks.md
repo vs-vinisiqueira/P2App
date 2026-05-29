@@ -11,4 +11,4 @@
 - [x] CRUD de usuários
 - [x] Login JWT
 ## Próximo
-- [ ] Testar autorização (admin vs user)
+- [x] Testar autorização (admin vs user)

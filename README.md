@@ -1,6 +1,6 @@
 # P2App Backend
 
-API backend desenvolvida com FastAPI para gerenciamento de usuários e autenticação, com arquitetura modular e preparada para expansão futura.
+API backend desenvolvida com FastAPI para gerenciamento de usuários, autenticação e chamados, com arquitetura modular e preparada para expansão futura.
 
 ## 📌 Sobre o projeto
 
@@ -11,6 +11,7 @@ Atualmente o sistema possui:
 - Cadastro de usuários
 - Autenticação com JWT
 - Controle de acesso por tipo de usuário
+- Gerenciamento inicial de chamados
 - Estrutura organizada para crescimento do projeto
 
 ## 🚀 Tecnologias utilizadas
@@ -19,6 +20,7 @@ Atualmente o sistema possui:
 - FastAPI
 - PostgreSQL
 - SQLAlchemy
+- Alembic
 - Pydantic
 - JWT (JSON Web Token)
 - Passlib (hash de senha)
@@ -27,7 +29,7 @@ Atualmente o sistema possui:
 
 ```bash
 app/
- core/        # Configurações e segurança (JWT, deps)
+ core/        # Configurações, segurança e autorização
  routes/      # Rotas da API
  schemas/     # Validação de dados (Pydantic)
  crud/        # Operações com banco de dados
@@ -85,6 +87,16 @@ A API ficará disponível em:
 http://127.0.0.1:8000
 ```
 
+## 🧪 Testes automatizados
+
+Execute a suíte com:
+
+```powershell
+venv\Scripts\python.exe -m pytest
+```
+
+Os testes usam SQLite em memória e validam cadastro público, login, rota autenticada, permissões administrativas e escopo de chamados por cliente.
+
 ## 📖 Documentação interativa
 
 Após iniciar o servidor, acesse o Swagger:
@@ -113,16 +125,26 @@ Fluxo básico:
 
 O token JWT utiliza o email do usuário como identificador no payload.
 
-## 👥 Tipos de usuário
+## 👥 Tipos de usuário e permissões
 
-O sistema trabalha com controle de acesso por tipo de usuário:
+O sistema separa tipo de usuário e permissão:
+
+- `tipo_usuario` representa o perfil de negócio.
+- `role` representa permissão de acesso.
+
+Tipos de usuário aceitos:
 
 - `admin`
 - `gerente`
 - `tecnico`
 - `cliente`
 
-No cadastro público, novos usuários são sempre criados como `cliente`.
+Roles aceitas:
+
+- `admin`
+- `user`
+
+No cadastro público, novos usuários são sempre criados com `tipo_usuario="cliente"` e `role="user"`.
 
 Perfis internos devem ser criados apenas por fluxos administrativos protegidos.
 
@@ -156,6 +178,10 @@ GET /auth/me
 
 Retorna os dados do usuário autenticado.
 
+### Módulo de chamados
+
+O módulo de chamados está disponível pelas rotas `/tickets`, com criação, listagem, consulta, atualização e exclusão protegidas por JWT. Usuários comuns acessam apenas os próprios chamados; administradores, gerentes e técnicos podem visualizar e atualizar chamados de suporte.
+
 ### Administrador
 
 ```http
@@ -163,6 +189,38 @@ GET /users/
 ```
 
 Lista usuários cadastrados. Requer usuário com perfil `admin`.
+
+### Chamados
+
+```http
+POST /tickets
+```
+
+Cria chamado para o cliente autenticado.
+
+```http
+GET /tickets
+```
+
+Lista chamados. Admin, gerente e técnico veem todos; usuários comuns veem apenas os próprios.
+
+```http
+GET /tickets/{ticket_id}
+```
+
+Consulta um chamado por ID.
+
+```http
+PATCH /tickets/{ticket_id}
+```
+
+Atualiza um chamado. Usuários comuns não podem alterar status nem responsável.
+
+```http
+DELETE /tickets/{ticket_id}
+```
+
+Remove um chamado.
 
 ## 🧪 Como testar pelo Swagger
 
@@ -210,7 +268,8 @@ GET /auth/me
 - Senhas são armazenadas com hash usando Passlib.
 - Tokens JWT possuem expiração configurável.
 - Rotas protegidas exigem token Bearer válido.
-- Rotas administrativas exigem usuário com perfil `admin`.
+- Rotas administrativas exigem `role="admin"`.
+- Valores de `tipo_usuario`, `role`, `status` e `prioridade` são validados também no banco.
 - Respostas públicas não expõem senha nem hash.
 
 ## 📌 Observações

@@ -6,9 +6,9 @@ Consolidar o módulo de chamados.
 ## Tasks
 - [ ] Gerar migration da tabela chamados
 - [ ] Aplicar migration no banco
-- [ ] Validar criação de chamado por cliente autenticado
-- [ ] Validar listagem de chamados por cliente
-- [ ] Validar listagem total para admin
+- [x] Validar criação de chamado por cliente autenticado
+- [x] Validar listagem de chamados por cliente
+- [x] Validar listagem total para admin
 - [ ] Revisar comportamento para gerente e técnico
 - [ ] Definir próximos campos do chamado
 - [ ] Atualizar documentação do projeto após validação

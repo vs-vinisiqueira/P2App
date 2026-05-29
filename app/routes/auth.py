@@ -1,5 +1,3 @@
-from urllib.parse import parse_qs
-
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
@@ -13,6 +11,19 @@ from app.schemas.auth import LoginRequest, TokenResponse
 from app.schemas.user import UserResponse
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
+
+
+async def _extrair_credenciais(request: Request) -> LoginRequest:
+    content_type = request.headers.get("content-type", "")
+
+    if content_type.startswith("application/x-www-form-urlencoded"):
+        form_data = await request.form()
+        return LoginRequest(
+            email=str(form_data.get("username") or form_data.get("email") or ""),
+            senha=str(form_data.get("password") or form_data.get("senha") or ""),
+        )
+
+    return LoginRequest.model_validate(await request.json())
 
 
 @router.post(
@@ -44,17 +55,8 @@ async def login(
     db: Session = Depends(get_db),
 ):
     try:
-        if request.headers.get("content-type", "").startswith(
-            "application/x-www-form-urlencoded"
-        ):
-            form_data = parse_qs((await request.body()).decode())
-            credenciais = LoginRequest(
-                email=form_data.get("username", form_data.get("email", [""]))[0],
-                senha=form_data.get("password", form_data.get("senha", [""]))[0],
-            )
-        else:
-            credenciais = LoginRequest.model_validate(await request.json())
-    except (IndexError, UnicodeDecodeError, ValueError, ValidationError) as exc:
+        credenciais = await _extrair_credenciais(request)
+    except (ValueError, ValidationError) as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email ou senha invalidos",

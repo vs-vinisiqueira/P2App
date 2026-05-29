@@ -1,3 +1,5 @@
 - Sistema baseado em roles (user/admin)
 - Middleware: require_admin
 - Rotas protegidas por nível de acesso
+- O campo `role` controla permissão de acesso.
+- O campo `tipo_usuario` representa o perfil de negócio do usuário.

@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
+from app.core.authorization import role_for_tipo_usuario
+from app.core.security import gerar_hash_senha
 from app.models.user import User
 from app.schemas.user import UserCreate
-from app.core.security import gerar_hash_senha
 
 
 def criar_usuario(db: Session, user: UserCreate):
@@ -19,7 +20,7 @@ def criar_usuario(db: Session, user: UserCreate):
         email=user.email,
         senha=senha_hash,
         tipo_usuario=user.tipo_usuario,
-        role="user",
+        role=role_for_tipo_usuario(user.tipo_usuario),
     )
 
     try:
