@@ -92,6 +92,17 @@ def test_admin_atualiza_status_do_chamado(
     assert response.status_code == 200
     assert response.json()["status"] == "in_progress"
 
+    events_response = client.get(
+        f"/tickets/{ticket['id']}/events",
+        headers=admin_auth_headers,
+    )
+
+    assert events_response.status_code == 200
+    events = events_response.json()
+    assert [event["event_type"] for event in events] == ["comment", "status_changed"]
+    assert events[-1]["old_value"] == "open"
+    assert events[-1]["new_value"] == "in_progress"
+
 
 def test_usuario_comum_nao_atualiza_status_do_chamado(
     client: TestClient,
@@ -112,3 +123,59 @@ def test_impedir_acesso_a_chamados_sem_token(client: TestClient) -> None:
     response = client.get("/tickets")
 
     assert response.status_code == 401
+
+
+def test_comentar_e_listar_historico_do_chamado(client: TestClient, regular_auth_headers) -> None:
+    ticket = _create_ticket(client, regular_auth_headers)
+
+    comment_response = client.post(
+        f"/tickets/{ticket['id']}/events",
+        headers=regular_auth_headers,
+        json={"message": "Cliente anexou evidencias e confirmou impacto."},
+    )
+
+    assert comment_response.status_code == 201
+    comment = comment_response.json()
+    assert comment["event_type"] == "comment"
+    assert comment["message"] == "Cliente anexou evidencias e confirmou impacto."
+
+    events_response = client.get(
+        f"/tickets/{ticket['id']}/events",
+        headers=regular_auth_headers,
+    )
+
+    assert events_response.status_code == 200
+    events = events_response.json()
+    assert [event["event_type"] for event in events] == ["comment", "comment"]
+    assert events[0]["message"] == "Chamado aberto."
+    assert events[1]["message"] == "Cliente anexou evidencias e confirmou impacto."
+
+
+def test_usuario_nao_comenta_chamado_de_terceiro(client: TestClient, regular_auth_headers) -> None:
+    ticket = _create_ticket(client, regular_auth_headers)
+
+    user_response = client.post(
+        "/users/",
+        json={
+            "nome": "Outro Cliente",
+            "email": "outro@example.com",
+            "senha": "12345678",
+            "tipo_usuario": "cliente",
+        },
+    )
+    assert user_response.status_code == 201
+
+    login_response = client.post(
+        "/auth/login",
+        json={"email": "outro@example.com", "senha": "12345678"},
+    )
+    assert login_response.status_code == 200
+    other_headers = {"Authorization": f"Bearer {login_response.json()['access_token']}"}
+
+    response = client.post(
+        f"/tickets/{ticket['id']}/events",
+        headers=other_headers,
+        json={"message": "Tentativa indevida."},
+    )
+
+    assert response.status_code == 403

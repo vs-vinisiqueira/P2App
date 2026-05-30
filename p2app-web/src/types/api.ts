@@ -21,6 +21,7 @@ export type TokenResponse = {
 
 export type TicketStatus = "open" | "in_progress" | "resolved" | "closed";
 export type TicketPriority = "low" | "medium" | "high" | "critical";
+export type TicketEventType = "comment" | "status_changed" | "assignment_changed";
 
 export type Ticket = {
   id: number;
@@ -57,3 +58,18 @@ export type TicketUpdateRequest = Partial<{
   category: string | null;
   assigned_to_id: number | null;
 }>;
+
+export type TicketEvent = {
+  id: number;
+  ticket_id: number;
+  actor_id: number;
+  event_type: TicketEventType;
+  message: string | null;
+  old_value: string | null;
+  new_value: string | null;
+  created_at: string;
+};
+
+export type TicketEventCreateRequest = {
+  message: string;
+};

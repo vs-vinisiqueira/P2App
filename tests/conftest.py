@@ -14,6 +14,7 @@ os.environ.setdefault("JWT_SECRET_KEY", "test-secret")
 from app.crud.user import criar_usuario  # noqa: E402
 from app.database import Base, get_db  # noqa: E402
 from app.main import app as fastapi_app  # noqa: E402
+from app.models.ticket_event import TicketEvent  # noqa: E402, F401
 from app.models.ticket import Ticket  # noqa: E402, F401
 from app.models.user import User  # noqa: E402, F401
 from app.schemas.user import UserCreate  # noqa: E402

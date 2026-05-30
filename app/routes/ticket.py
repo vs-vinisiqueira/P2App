@@ -11,10 +11,12 @@ from app.crud.ticket import (
     list_tickets,
     update_ticket,
 )
+from app.crud.ticket_event import create_ticket_event, list_ticket_events
 from app.database import get_db
 from app.models.ticket import Ticket
 from app.models.user import User
 from app.schemas.ticket import TicketCreate, TicketListResponse, TicketResponse, TicketUpdate
+from app.schemas.ticket_event import TicketEventCreate, TicketEventResponse
 
 router = APIRouter(prefix="/tickets", tags=["Tickets"])
 
@@ -41,7 +43,16 @@ def create(
             detail="Apenas suporte ou administradores podem definir responsavel",
         )
 
-    return create_ticket(db, ticket_data=ticket, owner_id=current_user.id)
+    created_ticket = create_ticket(db, ticket_data=ticket, owner_id=current_user.id)
+    create_ticket_event(
+        db,
+        ticket_id=created_ticket.id,
+        actor_id=current_user.id,
+        event_type="comment",
+        message="Chamado aberto.",
+    )
+
+    return created_ticket
 
 
 @router.get("", response_model=TicketListResponse)
@@ -103,7 +114,75 @@ def update(
                 detail="Apenas suporte ou administradores podem alterar status e responsavel",
             )
 
-    return update_ticket(db, ticket=ticket, ticket_data=ticket_data)
+    previous_status = ticket.status
+    previous_assigned_to_id = ticket.assigned_to_id
+
+    updated_ticket = update_ticket(db, ticket=ticket, ticket_data=ticket_data)
+
+    if previous_status != updated_ticket.status:
+        create_ticket_event(
+            db,
+            ticket_id=updated_ticket.id,
+            actor_id=current_user.id,
+            event_type="status_changed",
+            message="Status atualizado.",
+            old_value=previous_status,
+            new_value=updated_ticket.status,
+        )
+
+    if previous_assigned_to_id != updated_ticket.assigned_to_id:
+        create_ticket_event(
+            db,
+            ticket_id=updated_ticket.id,
+            actor_id=current_user.id,
+            event_type="assignment_changed",
+            message="Responsavel atualizado.",
+            old_value=str(previous_assigned_to_id) if previous_assigned_to_id else None,
+            new_value=str(updated_ticket.assigned_to_id) if updated_ticket.assigned_to_id else None,
+        )
+
+    return updated_ticket
+
+
+@router.get("/{ticket_id}/events", response_model=list[TicketEventResponse])
+def list_events(
+    ticket_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    ticket = get_ticket_by_id(db, ticket_id=ticket_id)
+    if ticket is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Chamado nao encontrado",
+        )
+
+    _ensure_ticket_access(ticket, current_user)
+    return list_ticket_events(db, ticket_id=ticket.id)
+
+
+@router.post("/{ticket_id}/events", response_model=TicketEventResponse, status_code=status.HTTP_201_CREATED)
+def create_event(
+    ticket_id: int,
+    event_data: TicketEventCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    ticket = get_ticket_by_id(db, ticket_id=ticket_id)
+    if ticket is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Chamado nao encontrado",
+        )
+
+    _ensure_ticket_access(ticket, current_user)
+    return create_ticket_event(
+        db,
+        ticket_id=ticket.id,
+        actor_id=current_user.id,
+        event_type="comment",
+        message=event_data.message,
+    )
 
 
 @router.delete("/{ticket_id}", status_code=status.HTTP_204_NO_CONTENT)
