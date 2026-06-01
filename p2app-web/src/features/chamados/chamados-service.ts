@@ -1,5 +1,12 @@
 import { api } from "@/lib/api";
-import type { Ticket, TicketCreateRequest, TicketListResponse, TicketUpdateRequest } from "@/types/api";
+import type {
+  Ticket,
+  TicketCreateRequest,
+  TicketEvent,
+  TicketEventCreateRequest,
+  TicketListResponse,
+  TicketUpdateRequest,
+} from "@/types/api";
 
 export async function listTickets() {
   const { data } = await api.get<TicketListResponse>("/tickets");
@@ -23,4 +30,14 @@ export async function updateTicket(ticketId: number, payload: TicketUpdateReques
 
 export async function deleteTicket(ticketId: number) {
   await api.delete(`/tickets/${ticketId}`);
+}
+
+export async function listTicketEvents(ticketId: number) {
+  const { data } = await api.get<TicketEvent[]>(`/tickets/${ticketId}/events`);
+  return data;
+}
+
+export async function createTicketEvent(ticketId: number, payload: TicketEventCreateRequest) {
+  const { data } = await api.post<TicketEvent>(`/tickets/${ticketId}/events`, payload);
+  return data;
 }

@@ -210,6 +210,40 @@ A suite Pytest esta organizada em `tests/test_auth.py`, `tests/test_users.py` e 
 pytest
 ```
 
+## Ambiente demo local
+
+Para validar o fluxo completo de portfolio, use banco migrado e dados previsiveis:
+
+```powershell
+$env:DATABASE_URL="postgresql://p2app:troque-esta-senha@localhost:5432/p2app"
+$env:JWT_SECRET_KEY="troque-esta-chave-local"
+venv\Scripts\python.exe -m alembic upgrade head
+venv\Scripts\python.exe scripts\seed_demo.py
+venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8001
+```
+
+O seed cria usuarios locais de demonstracao com a senha padrao `P2AppDemo123!`:
+
+| Perfil | E-mail |
+| --- | --- |
+| Cliente | `cliente.demo@example.com` |
+| Tecnico | `tecnico.demo@example.com` |
+| Gerente | `gerente.demo@example.com` |
+| Admin | `admin.demo@example.com` |
+
+Para trocar a senha do seed sem alterar codigo:
+
+```powershell
+$env:P2APP_DEMO_PASSWORD="uma-senha-local"
+venv\Scripts\python.exe scripts\seed_demo.py
+```
+
+Depois, rode o frontend com `NEXT_PUBLIC_API_URL=http://127.0.0.1:8001` e acesse `http://127.0.0.1:3000`.
+
+Screenshot da demo:
+
+![Dashboard demo](docs/screenshots/p2app-dashboard-demo.png)
+
 ## Endpoints principais
 
 | Metodo | Rota | Autenticacao | Perfil necessario | Descricao |
@@ -417,8 +451,6 @@ As rotas `/chamados` traduzem valores em portugues para os valores internos do t
 
 ## Proximos passos
 
-- Criar seed ou fluxo administrativo para cadastro inicial de usuarios admin.
-- Adicionar CI com GitHub Actions.
 - Melhorar a documentacao Swagger com descricoes mais detalhadas por endpoint.
 - Preparar deploy em ambiente de nuvem.
 - Adicionar prints do Swagger ou exemplos visuais ao README.

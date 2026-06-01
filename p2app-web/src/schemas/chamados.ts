@@ -22,5 +22,14 @@ export const updateTicketSchema = createTicketSchema.extend({
   status: ticketStatusSchema,
 });
 
+export const ticketEventSchema = z.object({
+  message: z
+    .string()
+    .trim()
+    .min(1, "Comentario obrigatorio.")
+    .max(1000, "Comentario deve ter no maximo 1000 caracteres."),
+});
+
 export type CreateTicketFormData = z.infer<typeof createTicketSchema>;
 export type UpdateTicketFormData = z.infer<typeof updateTicketSchema>;
+export type TicketEventFormData = z.infer<typeof ticketEventSchema>;

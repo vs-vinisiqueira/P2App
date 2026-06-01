@@ -35,3 +35,9 @@ class Ticket(Base):
 
     owner = relationship("User", foreign_keys=[owner_id], backref="owned_tickets")
     assigned_to = relationship("User", foreign_keys=[assigned_to_id], backref="assigned_tickets")
+    events = relationship(
+        "TicketEvent",
+        back_populates="ticket",
+        cascade="all, delete-orphan",
+        order_by="TicketEvent.created_at.asc(), TicketEvent.id.asc()",
+    )
