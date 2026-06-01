@@ -26,3 +26,7 @@ Thumbs.db
 
 # Banco local (caso use SQLite futuramente)
 *.db
+
+# Frontend test artifacts
+p2app-web/test-results/
+p2app-web/playwright-report/

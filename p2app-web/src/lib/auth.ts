@@ -2,6 +2,48 @@ import type { User } from "@/types/api";
 
 const TOKEN_KEY = "p2app_token";
 const USER_KEY = "p2app_user";
+const AUTH_CHANGED_EVENT = "p2app:auth-changed";
+const AUTH_CHANNEL = "p2app-auth";
+
+function notifyAuthChanged() {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+
+  if ("BroadcastChannel" in window) {
+    const channel = new BroadcastChannel(AUTH_CHANNEL);
+    channel.postMessage(AUTH_CHANGED_EVENT);
+    channel.close();
+  }
+}
+
+export function subscribeToAuthChanges(onStoreChange: () => void) {
+  if (typeof window === "undefined") return () => {};
+
+  const channel = "BroadcastChannel" in window ? new BroadcastChannel(AUTH_CHANNEL) : null;
+  const handleAuthChange = () => onStoreChange();
+  const handleStorageChange = (event: StorageEvent) => {
+    if (!event.key || event.key === TOKEN_KEY || event.key === USER_KEY) {
+      onStoreChange();
+    }
+  };
+  const intervalId = window.setInterval(onStoreChange, 500);
+
+  window.addEventListener(AUTH_CHANGED_EVENT, handleAuthChange);
+  window.addEventListener("storage", handleStorageChange);
+  window.addEventListener("focus", handleAuthChange);
+  document.addEventListener("visibilitychange", handleAuthChange);
+  channel?.addEventListener("message", handleAuthChange);
+
+  return () => {
+    window.clearInterval(intervalId);
+    window.removeEventListener(AUTH_CHANGED_EVENT, handleAuthChange);
+    window.removeEventListener("storage", handleStorageChange);
+    window.removeEventListener("focus", handleAuthChange);
+    document.removeEventListener("visibilitychange", handleAuthChange);
+    channel?.removeEventListener("message", handleAuthChange);
+    channel?.close();
+  };
+}
 
 export function getToken() {
   if (typeof window === "undefined") return null;
@@ -10,16 +52,19 @@ export function getToken() {
 
 export function setToken(token: string) {
   window.localStorage.setItem(TOKEN_KEY, token);
+  notifyAuthChanged();
 }
 
 export function clearAuth() {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(TOKEN_KEY);
   window.localStorage.removeItem(USER_KEY);
+  notifyAuthChanged();
 }
 
 export function setStoredUser(user: User) {
   window.localStorage.setItem(USER_KEY, JSON.stringify(user));
+  notifyAuthChanged();
 }
 
 export function getStoredUser(): User | null {

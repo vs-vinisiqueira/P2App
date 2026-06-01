@@ -104,6 +104,75 @@ def test_admin_atualiza_status_do_chamado(
     assert events[-1]["new_value"] == "in_progress"
 
 
+def test_tecnico_lista_chamados_de_todos_os_usuarios(
+    client: TestClient,
+    regular_auth_headers,
+    tecnico_auth_headers,
+) -> None:
+    _create_ticket(client, regular_auth_headers, title="Chamado visivel ao tecnico")
+
+    response = client.get("/tickets", headers=tecnico_auth_headers)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] == 1
+    assert data["items"][0]["title"] == "Chamado visivel ao tecnico"
+
+
+def test_gerente_atualiza_status_e_responsavel_do_chamado(
+    client: TestClient,
+    regular_auth_headers,
+    gerente_auth_headers,
+    tecnico_user,
+) -> None:
+    ticket = _create_ticket(client, regular_auth_headers)
+
+    response = client.patch(
+        f"/tickets/{ticket['id']}",
+        headers=gerente_auth_headers,
+        json={
+            "status": "in_progress",
+            "assigned_to_id": tecnico_user.id,
+        },
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "in_progress"
+    assert data["assigned_to_id"] == tecnico_user.id
+
+    events_response = client.get(
+        f"/tickets/{ticket['id']}/events",
+        headers=gerente_auth_headers,
+    )
+
+    assert events_response.status_code == 200
+    assert [event["event_type"] for event in events_response.json()] == [
+        "comment",
+        "status_changed",
+        "assignment_changed",
+    ]
+
+
+def test_usuario_comum_nao_define_responsavel_ao_criar_chamado(
+    client: TestClient,
+    regular_auth_headers,
+    tecnico_user,
+) -> None:
+    response = client.post(
+        "/tickets",
+        headers=regular_auth_headers,
+        json={
+            "title": "Tentativa com responsavel",
+            "description": "Cliente nao pode direcionar responsavel na abertura.",
+            "priority": "medium",
+            "assigned_to_id": tecnico_user.id,
+        },
+    )
+
+    assert response.status_code == 403
+
+
 def test_usuario_comum_nao_atualiza_status_do_chamado(
     client: TestClient,
     regular_auth_headers,

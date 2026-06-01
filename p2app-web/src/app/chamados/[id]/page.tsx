@@ -21,6 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { getOperationalRisk, getTicketAgeInHours } from "@/features/chamados/chamados-analytics";
 import { formatDate, priorityLabels, statusLabels } from "@/features/chamados/chamados-format";
 import { createTicketEvent, deleteTicket, getTicket, listTicketEvents, updateTicket } from "@/features/chamados/chamados-service";
+import { useAuthToken } from "@/hooks/use-auth";
 import { getApiErrorMessage } from "@/lib/api";
 import { getStoredUser, isSupportUser } from "@/lib/auth";
 import { ticketEventSchema, updateTicketSchema, type TicketEventFormData, type UpdateTicketFormData } from "@/schemas/chamados";
@@ -30,6 +31,7 @@ export default function ChamadoDetalhePage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { isAuthenticated } = useAuthToken();
   const ticketId = Number(params.id);
   const user = getStoredUser();
   const canEditRestrictedFields = isSupportUser(user);
@@ -37,12 +39,12 @@ export default function ChamadoDetalhePage() {
   const ticketQuery = useQuery({
     queryKey: ["ticket", ticketId],
     queryFn: () => getTicket(ticketId),
-    enabled: Number.isFinite(ticketId),
+    enabled: isAuthenticated && Number.isFinite(ticketId),
   });
   const eventsQuery = useQuery({
     queryKey: ["ticket", ticketId, "events"],
     queryFn: () => listTicketEvents(ticketId),
-    enabled: Number.isFinite(ticketId),
+    enabled: isAuthenticated && Number.isFinite(ticketId),
   });
 
   const form = useForm<UpdateTicketFormData>({
@@ -147,10 +149,10 @@ export default function ChamadoDetalhePage() {
                     </span>
                   ) : null}
                 </div>
-                <h2 className="text-2xl font-semibold tracking-tight text-slate-950 dark:text-white">{ticket.title}</h2>
+                <h2 className="break-words text-2xl font-semibold tracking-tight text-slate-950 dark:text-white">{ticket.title}</h2>
                 <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Chamado #{ticket.id}</p>
               </div>
-              <div className="grid gap-3 sm:grid-cols-3 lg:w-[520px]">
+              <div className="grid min-w-0 gap-3 sm:grid-cols-3 lg:w-[520px]">
                 <HeroFact icon={Activity} label="Risco" value={getOperationalRisk(ticket)} />
                 <HeroFact icon={CalendarClock} label="Idade" value={`${getTicketAgeInHours(ticket)}h`} />
                 <HeroFact icon={UserCheck} label="Responsavel" value={ticket.assigned_to_id ? `#${ticket.assigned_to_id}` : "Livre"} />
@@ -173,12 +175,12 @@ export default function ChamadoDetalhePage() {
                     <Label htmlFor="description">Descricao</Label>
                     <Textarea id="description" rows={7} {...form.register("description")} />
                   </div>
-                  <div className="grid gap-4 md:grid-cols-3">
+                  <div className="grid min-w-0 gap-4 md:grid-cols-3">
                     <div className="space-y-2">
                       <Label htmlFor="priority">Prioridade</Label>
                       <Select value={selectedPriority} onValueChange={(value) => form.setValue("priority", value as UpdateTicketFormData["priority"])}>
                         <SelectTrigger id="priority" className="h-9 w-full">
-                          <span>{selectedPriority ? priorityLabels[selectedPriority] : "Prioridade"}</span>
+                          <span className="min-w-0 truncate">{selectedPriority ? priorityLabels[selectedPriority] : "Prioridade"}</span>
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="low">Baixa</SelectItem>
@@ -196,7 +198,7 @@ export default function ChamadoDetalhePage() {
                         disabled={!canEditRestrictedFields}
                       >
                         <SelectTrigger id="status" className="h-9 w-full">
-                          <span>{selectedStatus ? statusLabels[selectedStatus] : "Status"}</span>
+                          <span className="min-w-0 truncate">{selectedStatus ? statusLabels[selectedStatus] : "Status"}</span>
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="open">Aberto</SelectItem>
@@ -218,7 +220,7 @@ export default function ChamadoDetalhePage() {
                   ) : null}
                   <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
                     <Dialog>
-                      <DialogTrigger render={<Button type="button" variant="destructive" />}>
+                      <DialogTrigger render={<Button type="button" variant="destructive" className="w-full sm:w-auto" />}>
                         <Trash2 className="size-4" />
                         Excluir
                       </DialogTrigger>
@@ -235,7 +237,7 @@ export default function ChamadoDetalhePage() {
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
-                    <Button type="submit" className="bg-yellow-400 text-slate-950 hover:bg-yellow-300" disabled={updateMutation.isPending}>
+                    <Button type="submit" className="w-full bg-yellow-400 text-slate-950 hover:bg-yellow-300 sm:w-auto" disabled={updateMutation.isPending}>
                       {updateMutation.isPending ? "Salvando..." : "Salvar alteracoes"}
                     </Button>
                   </div>
@@ -327,23 +329,23 @@ function HeroFact({
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-lg bg-slate-50 px-3 py-2 dark:bg-white/5">
-      <span className="text-slate-500 dark:text-slate-400">{label}</span>
-      <span className="truncate font-medium">{value}</span>
+    <div className="flex min-w-0 items-center justify-between gap-4 rounded-lg bg-slate-50 px-3 py-2 dark:bg-white/5">
+      <span className="shrink-0 text-slate-500 dark:text-slate-400">{label}</span>
+      <span className="min-w-0 truncate font-medium">{value}</span>
     </div>
   );
 }
 
 function TimelineItem({ event, active = false }: { event: TicketEvent; active?: boolean }) {
   return (
-    <div className="flex gap-3">
+    <div className="flex min-w-0 gap-3">
       <div className="mt-1 flex flex-col items-center">
         <div className={active ? "size-2.5 rounded-full bg-yellow-400" : "size-2.5 rounded-full bg-slate-300 dark:bg-slate-600"} />
         <div className="mt-1 h-full min-h-8 w-px bg-slate-200 dark:bg-white/10" />
       </div>
-      <div>
+      <div className="min-w-0">
         <p className="text-sm font-medium">{formatEventTitle(event)}</p>
-        {event.message ? <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{event.message}</p> : null}
+        {event.message ? <p className="mt-1 break-words text-sm text-slate-600 dark:text-slate-300">{event.message}</p> : null}
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Usuario #{event.actor_id} em {formatDate(event.created_at)}
         </p>

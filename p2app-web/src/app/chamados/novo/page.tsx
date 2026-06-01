@@ -48,7 +48,7 @@ export default function NovoChamadoPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto grid max-w-6xl gap-6 xl:grid-cols-[1fr_360px]">
+      <div className="mx-auto grid min-w-0 max-w-6xl gap-6 xl:grid-cols-[1fr_360px]">
         <Card className="border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#0B1B2B]">
           <CardHeader>
             <p className="text-sm text-slate-500 dark:text-slate-400">Abertura de atendimento</p>
@@ -79,7 +79,7 @@ export default function NovoChamadoPage() {
                   <Label htmlFor="priority">Prioridade</Label>
                   <Select value={selectedPriority} onValueChange={(value) => form.setValue("priority", value as CreateTicketFormData["priority"])}>
                     <SelectTrigger id="priority" className="h-9 w-full">
-                      <span>{selectedPriority ? priorityLabels[selectedPriority] : "Prioridade"}</span>
+                      <span className="min-w-0 truncate">{selectedPriority ? priorityLabels[selectedPriority] : "Prioridade"}</span>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="low">Baixa</SelectItem>
@@ -94,11 +94,11 @@ export default function NovoChamadoPage() {
                   <Input id="category" placeholder="infra" {...form.register("category")} />
                 </div>
               </div>
-              <div className="flex justify-end gap-3">
-                <Button type="button" variant="outline" onClick={() => router.push("/chamados")}>
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={() => router.push("/chamados")}>
                   Cancelar
                 </Button>
-                <Button type="submit" className="bg-yellow-400 text-slate-950 hover:bg-yellow-300" disabled={mutation.isPending}>
+                <Button type="submit" className="w-full bg-yellow-400 text-slate-950 hover:bg-yellow-300 sm:w-auto" disabled={mutation.isPending}>
                   {mutation.isPending ? "Criando..." : "Criar chamado"}
                 </Button>
               </div>
@@ -131,7 +131,7 @@ function SideCard({
         <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-yellow-400/15 text-yellow-700 dark:text-yellow-300">
           <Icon className="size-5" />
         </div>
-        <div>
+        <div className="min-w-0">
           <p className="font-medium">{title}</p>
           <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">{text}</p>
         </div>

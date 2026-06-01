@@ -94,6 +94,36 @@ def admin_user(db_session: Session) -> User:
     return user
 
 
+@pytest.fixture
+def gerente_user(db_session: Session) -> User:
+    user = criar_usuario(
+        db_session,
+        UserCreate(
+            nome="Gerente de Suporte",
+            email="gerente@example.com",
+            senha="12345678",
+            tipo_usuario="gerente",
+        ),
+    )
+    assert user is not None
+    return user
+
+
+@pytest.fixture
+def tecnico_user(db_session: Session) -> User:
+    user = criar_usuario(
+        db_session,
+        UserCreate(
+            nome="Tecnico de Suporte",
+            email="tecnico@example.com",
+            senha="12345678",
+            tipo_usuario="tecnico",
+        ),
+    )
+    assert user is not None
+    return user
+
+
 def login_token(client: TestClient, email: str, senha: str = "12345678") -> str:
     response = client.post("/auth/login", json={"email": email, "senha": senha})
     assert response.status_code == 200
@@ -115,6 +145,16 @@ def admin_token(client: TestClient, admin_user: User) -> str:
 
 
 @pytest.fixture
+def gerente_token(client: TestClient, gerente_user: User) -> str:
+    return login_token(client, gerente_user.email)
+
+
+@pytest.fixture
+def tecnico_token(client: TestClient, tecnico_user: User) -> str:
+    return login_token(client, tecnico_user.email)
+
+
+@pytest.fixture
 def regular_auth_headers(regular_token: str) -> dict[str, str]:
     return auth_headers(regular_token)
 
@@ -122,3 +162,13 @@ def regular_auth_headers(regular_token: str) -> dict[str, str]:
 @pytest.fixture
 def admin_auth_headers(admin_token: str) -> dict[str, str]:
     return auth_headers(admin_token)
+
+
+@pytest.fixture
+def gerente_auth_headers(gerente_token: str) -> dict[str, str]:
+    return auth_headers(gerente_token)
+
+
+@pytest.fixture
+def tecnico_auth_headers(tecnico_token: str) -> dict[str, str]:
+    return auth_headers(tecnico_token)

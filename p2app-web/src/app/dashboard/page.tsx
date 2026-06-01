@@ -26,6 +26,7 @@ import {
 } from "@/features/chamados/chamados-analytics";
 import { formatDate } from "@/features/chamados/chamados-format";
 import { listTickets } from "@/features/chamados/chamados-service";
+import { useAuthToken } from "@/hooks/use-auth";
 
 const statusCards = [
   { label: "Abertos", icon: AlertCircle, status: "open" },
@@ -35,7 +36,8 @@ const statusCards = [
 ] as const;
 
 export default function DashboardPage() {
-  const ticketsQuery = useQuery({ queryKey: ["tickets"], queryFn: listTickets });
+  const { isAuthenticated } = useAuthToken();
+  const ticketsQuery = useQuery({ queryKey: ["tickets"], queryFn: listTickets, enabled: isAuthenticated });
   const tickets = ticketsQuery.data?.items ?? [];
   const metrics = getTicketMetrics(tickets, ticketsQuery.data?.total);
   const statusCounts = getStatusCounts(tickets);
@@ -51,9 +53,9 @@ export default function DashboardPage() {
           <div className="grid gap-0 xl:grid-cols-[1fr_360px]">
             <div className="p-6 sm:p-7">
               <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
-                <div className="max-w-2xl">
+                <div className="min-w-0 max-w-2xl">
                   <p className="text-sm font-medium text-yellow-700 dark:text-yellow-300">Resumo operacional</p>
-                  <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">
+                  <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
                     Fila de atendimento tecnico
                   </h2>
                   <p className="mt-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
@@ -63,7 +65,7 @@ export default function DashboardPage() {
                 <Link
                   href="/chamados/novo"
                   className={buttonVariants({
-                    className: "bg-yellow-400 text-slate-950 shadow-sm hover:bg-yellow-300",
+                    className: "w-full bg-yellow-400 text-slate-950 shadow-sm hover:bg-yellow-300 sm:w-auto",
                   })}
                 >
                   <Plus className="size-4" />
@@ -164,12 +166,12 @@ export default function DashboardPage() {
                       href={`/chamados/${ticket.id}`}
                       className="block rounded-lg border border-slate-200 bg-slate-50 p-3 transition hover:border-yellow-300 hover:bg-yellow-50/70 dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/5"
                     >
-                      <div className="mb-2 flex items-center justify-between gap-3">
-                        <span className="truncate text-sm font-medium">{ticket.title}</span>
+                      <div className="mb-2 flex min-w-0 items-center justify-between gap-3">
+                        <span className="min-w-0 truncate text-sm font-medium">{ticket.title}</span>
                         <TicketPriorityBadge priority={ticket.priority} />
                       </div>
-                      <div className="flex items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
-                        <span>{getOperationalRisk(ticket)}</span>
+                      <div className="flex min-w-0 items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+                        <span className="min-w-0 truncate">{getOperationalRisk(ticket)}</span>
                         <span>#{ticket.id}</span>
                       </div>
                     </Link>
@@ -222,9 +224,9 @@ function StatusMeter({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3 text-sm">
-        <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-          <Icon className="size-4 text-yellow-600 dark:text-yellow-300" />
-          <span>{label}</span>
+        <div className="flex min-w-0 items-center gap-2 text-slate-600 dark:text-slate-300">
+          <Icon className="size-4 shrink-0 text-yellow-600 dark:text-yellow-300" />
+          <span className="truncate">{label}</span>
         </div>
         {value === null ? <Skeleton className="h-5 w-8" /> : <span className="font-medium">{value}</span>}
       </div>

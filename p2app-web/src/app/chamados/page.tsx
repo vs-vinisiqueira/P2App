@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getOperationalRisk, getTicketAgeInHours, getTicketMetrics } from "@/features/chamados/chamados-analytics";
 import { formatDate, priorityLabels, statusLabels } from "@/features/chamados/chamados-format";
 import { listTickets } from "@/features/chamados/chamados-service";
+import { useAuthToken } from "@/hooks/use-auth";
 import type { TicketPriority, TicketStatus } from "@/types/api";
 
 const statusOptions: Array<{ value: "all" | TicketStatus; label: string }> = [
@@ -34,10 +35,11 @@ const priorityOptions: Array<{ value: "all" | TicketPriority; label: string }> =
 ];
 
 export default function ChamadosPage() {
+  const { isAuthenticated } = useAuthToken();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"all" | TicketStatus>("all");
   const [priority, setPriority] = useState<"all" | TicketPriority>("all");
-  const ticketsQuery = useQuery({ queryKey: ["tickets"], queryFn: listTickets });
+  const ticketsQuery = useQuery({ queryKey: ["tickets"], queryFn: listTickets, enabled: isAuthenticated });
   const tickets = useMemo(() => ticketsQuery.data?.items ?? [], [ticketsQuery.data?.items]);
   const metrics = getTicketMetrics(tickets, ticketsQuery.data?.total);
 
@@ -60,11 +62,11 @@ export default function ChamadosPage() {
       <div className="space-y-5">
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#091827]">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-            <div>
+            <div className="min-w-0">
               <p className="text-sm text-slate-500 dark:text-slate-400">Consulta e triagem</p>
-              <h2 className="mt-1 text-2xl font-semibold tracking-tight">Chamados tecnicos</h2>
+              <h2 className="mt-1 break-words text-2xl font-semibold tracking-tight">Chamados tecnicos</h2>
             </div>
-            <Link href="/chamados/novo" className={buttonVariants({ className: "bg-yellow-400 text-slate-950 hover:bg-yellow-300" })}>
+            <Link href="/chamados/novo" className={buttonVariants({ className: "w-full bg-yellow-400 text-slate-950 hover:bg-yellow-300 sm:w-auto" })}>
               <Plus className="size-4" />
               Criar chamado
             </Link>
@@ -80,7 +82,7 @@ export default function ChamadosPage() {
 
         <Card className="border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#0B1B2B]">
           <CardContent className="grid gap-3 p-4 lg:grid-cols-[1fr_190px_190px]">
-            <div className="relative">
+            <div className="relative min-w-0">
               <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
               <Input
                 value={search}
@@ -92,7 +94,7 @@ export default function ChamadosPage() {
             <Select value={status} onValueChange={(value) => setStatus(value as "all" | TicketStatus)}>
               <SelectTrigger className="h-9 w-full">
                 <SlidersHorizontal className="size-4 text-slate-400" />
-                <span>{status === "all" ? "Todos" : statusLabels[status]}</span>
+                <span className="min-w-0 truncate">{status === "all" ? "Todos" : statusLabels[status]}</span>
               </SelectTrigger>
               <SelectContent>
                 {statusOptions.map((option) => (
@@ -105,7 +107,7 @@ export default function ChamadosPage() {
             <Select value={priority} onValueChange={(value) => setPriority(value as "all" | TicketPriority)}>
               <SelectTrigger className="h-9 w-full">
                 <AlertTriangle className="size-4 text-slate-400" />
-                <span>{priority === "all" ? "Todas" : priorityLabels[priority]}</span>
+                <span className="min-w-0 truncate">{priority === "all" ? "Todas" : priorityLabels[priority]}</span>
               </SelectTrigger>
               <SelectContent>
                 {priorityOptions.map((option) => (
@@ -144,7 +146,7 @@ export default function ChamadosPage() {
               <Link key={ticket.id} href={`/chamados/${ticket.id}`}>
                 <Card className="border-slate-200 bg-white shadow-sm transition hover:border-yellow-300 hover:shadow-md dark:border-white/10 dark:bg-[#0B1B2B]">
                   <CardContent className="p-5">
-                    <div className="grid gap-5 xl:grid-cols-[1fr_260px]">
+                    <div className="grid min-w-0 gap-5 xl:grid-cols-[1fr_260px]">
                       <div className="min-w-0">
                         <div className="mb-3 flex flex-wrap gap-2">
                           <TicketStatusBadge status={ticket.status} />
@@ -155,7 +157,7 @@ export default function ChamadosPage() {
                             </span>
                           ) : null}
                         </div>
-                        <h3 className="text-lg font-semibold tracking-tight">{ticket.title}</h3>
+                        <h3 className="break-words text-lg font-semibold tracking-tight">{ticket.title}</h3>
                         <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500 dark:text-slate-400">{ticket.description}</p>
                       </div>
                       <div className="grid gap-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-600 dark:bg-white/[0.04] dark:text-slate-300">
@@ -187,8 +189,8 @@ function QueueStat({ label, value }: { label: string; value: number | string }) 
 function InfoPill({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-slate-500 dark:text-slate-400">{label}</span>
-      <span className="truncate font-medium">{value}</span>
+      <span className="shrink-0 text-slate-500 dark:text-slate-400">{label}</span>
+      <span className="min-w-0 truncate font-medium">{value}</span>
     </div>
   );
 }

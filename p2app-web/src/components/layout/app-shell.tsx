@@ -22,7 +22,7 @@ const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
   "/chamados": "Chamados",
   "/chamados/novo": "Novo chamado",
-  "/usuarios": "Usuários",
+  "/usuarios": "Usuarios",
 };
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -52,7 +52,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </div>
               <div>
                 <p className="text-lg font-semibold">P2App</p>
-                <p className="text-xs text-slate-400">Helpdesk técnico</p>
+                <p className="text-xs text-slate-400">Helpdesk tecnico</p>
               </div>
             </Link>
           </div>
@@ -61,7 +61,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             {navigation.map((item) => (
               <SidebarLink key={item.href} active={pathname === item.href} {...item} />
             ))}
-            {canSeeUsers ? <SidebarLink href="/usuarios" label="Usuários" icon={Users} active={pathname === "/usuarios"} /> : null}
+            {canSeeUsers ? <SidebarLink href="/usuarios" label="Usuarios" icon={Users} active={pathname === "/usuarios"} /> : null}
           </nav>
           <div className="border-t border-white/10 p-4">
             <div className="mb-4 flex items-center gap-3 rounded-lg bg-white/5 p-3">
@@ -71,7 +71,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{user?.nome ?? "Usuário"}</p>
+                <p className="truncate text-sm font-medium">{user?.nome ?? "Usuario"}</p>
                 <p className="truncate text-xs text-slate-400">{user?.email}</p>
               </div>
             </div>
@@ -85,20 +85,66 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <div className="lg:pl-72">
         <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 px-4 py-4 backdrop-blur dark:border-white/10 dark:bg-[#07111F]/90 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-yellow-600 dark:text-yellow-300">Operação técnica</p>
-              <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+          <div className="flex flex-col gap-4">
+            <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-yellow-600 dark:text-yellow-300">Operacao tecnica</p>
+                <h1 className="truncate text-2xl font-semibold tracking-tight">{title}</h1>
+              </div>
+              <div className="flex min-w-0 flex-wrap items-center gap-2">
+                <div className="min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <Settings className="size-4 shrink-0 text-yellow-500" />
+                    <span className="truncate">API: {process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}</span>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  className="border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 lg:hidden"
+                  onClick={logout}
+                >
+                  <LogOut className="size-4" />
+                  Sair
+                </Button>
+              </div>
             </div>
-            <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
-              <Settings className="size-4 text-yellow-500" />
-              API: {process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}
+
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 lg:hidden">
+              {navigation.map((item) => (
+                <MobileNavLink key={item.href} active={pathname === item.href} {...item} />
+              ))}
+              {canSeeUsers ? <MobileNavLink href="/usuarios" label="Usuarios" icon={Users} active={pathname === "/usuarios"} /> : null}
             </div>
           </div>
         </header>
         <main className="px-4 py-6 sm:px-6 lg:px-8">{children}</main>
       </div>
     </div>
+  );
+}
+
+function MobileNavLink({
+  href,
+  label,
+  icon: Icon,
+  active,
+}: {
+  href: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  active: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "flex shrink-0 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10",
+        active && "border-yellow-300 bg-yellow-400 text-slate-950 hover:bg-yellow-300 dark:border-yellow-300 dark:bg-yellow-400 dark:text-slate-950",
+      )}
+    >
+      <Icon className="size-4" />
+      {label}
+    </Link>
   );
 }
 

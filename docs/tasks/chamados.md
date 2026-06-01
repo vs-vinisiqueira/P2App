@@ -1,17 +1,17 @@
-# Próxima sprint - chamados
+# Proxima sprint - chamados
 
 ## Objetivo
-Consolidar o módulo de chamados.
+Consolidar o modulo de chamados.
 
 ## Tasks
-- [ ] Gerar migration da tabela chamados
-- [ ] Aplicar migration no banco
-- [x] Validar criação de chamado por cliente autenticado
+- [x] Gerar migration da tabela chamados
+- [x] Aplicar migration no banco
+- [x] Validar criacao de chamado por cliente autenticado
 - [x] Validar listagem de chamados por cliente
 - [x] Validar listagem total para admin
-- [ ] Revisar comportamento para gerente e técnico
-- [ ] Definir próximos campos do chamado
-- [ ] Atualizar documentação do projeto após validação
+- [x] Revisar comportamento para gerente e tecnico
+- [ ] Definir proximos campos do chamado
+- [x] Atualizar documentacao do projeto apos validacao
 
-## Critério de pronto
-O módulo de chamados deve funcionar do banco até a rota, sem depender de ajustes manuais fora do fluxo normal de migration.
+## Criterio de pronto
+O modulo de chamados deve funcionar do banco ate a rota, sem depender de ajustes manuais fora do fluxo normal de migration.
