@@ -26,7 +26,6 @@ export function subscribeToAuthChanges(onStoreChange: () => void) {
       onStoreChange();
     }
   };
-  const intervalId = window.setInterval(onStoreChange, 500);
 
   window.addEventListener(AUTH_CHANGED_EVENT, handleAuthChange);
   window.addEventListener("storage", handleStorageChange);
@@ -35,7 +34,6 @@ export function subscribeToAuthChanges(onStoreChange: () => void) {
   channel?.addEventListener("message", handleAuthChange);
 
   return () => {
-    window.clearInterval(intervalId);
     window.removeEventListener(AUTH_CHANGED_EVENT, handleAuthChange);
     window.removeEventListener("storage", handleStorageChange);
     window.removeEventListener("focus", handleAuthChange);
