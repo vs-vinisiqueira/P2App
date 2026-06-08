@@ -23,7 +23,7 @@ def create_ticket_event(
     )
 
     db.add(event)
-    db.commit()
+    db.flush()
     db.refresh(event)
 
     return event

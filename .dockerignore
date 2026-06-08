@@ -8,6 +8,7 @@ __pycache__
 venv
 tests
 docs/.obsidian
+p2app-web
 *.log
 *.tmp
 *.db

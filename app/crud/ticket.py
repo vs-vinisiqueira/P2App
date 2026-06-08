@@ -21,7 +21,7 @@ def create_ticket(
     )
 
     db.add(ticket)
-    db.commit()
+    db.flush()
     db.refresh(ticket)
 
     return ticket
@@ -69,7 +69,7 @@ def update_ticket(
     for field, value in update_data.items():
         setattr(ticket, field, value)
 
-    db.commit()
+    db.flush()
     db.refresh(ticket)
 
     return ticket

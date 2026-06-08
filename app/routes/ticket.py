@@ -51,6 +51,8 @@ def create(
         event_type="comment",
         message="Chamado aberto.",
     )
+    db.commit()
+    db.refresh(created_ticket)
 
     return created_ticket
 
@@ -141,6 +143,9 @@ def update(
             new_value=str(updated_ticket.assigned_to_id) if updated_ticket.assigned_to_id else None,
         )
 
+    db.commit()
+    db.refresh(updated_ticket)
+
     return updated_ticket
 
 
@@ -176,13 +181,16 @@ def create_event(
         )
 
     _ensure_ticket_access(ticket, current_user)
-    return create_ticket_event(
+    event = create_ticket_event(
         db,
         ticket_id=ticket.id,
         actor_id=current_user.id,
         event_type="comment",
         message=event_data.message,
     )
+    db.commit()
+    db.refresh(event)
+    return event
 
 
 @router.delete("/{ticket_id}", status_code=status.HTTP_204_NO_CONTENT)
