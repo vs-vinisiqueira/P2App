@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import {
   AlertCircle,
+  ArrowRight,
   CheckCircle,
   Clock,
   Gauge,
@@ -54,35 +55,48 @@ export default function DashboardPage() {
             <div className="p-6 sm:p-7">
               <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
                 <div className="min-w-0 max-w-2xl">
-                  <p className="text-sm font-medium text-yellow-700 dark:text-yellow-300">Resumo operacional</p>
-                  <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
-                    Fila de atendimento tecnico
+                  <p className="text-sm font-semibold text-yellow-700 dark:text-yellow-300">Resumo operacional</p>
+                  <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 dark:text-white">
+                    Fila de atendimento tecnico sob controle
                   </h2>
                   <p className="mt-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
-                    Visao consolidada de volume, risco e conclusao para acompanhar a saude da operacao.
+                    Visao consolidada de volume, risco e conclusao para entender onde agir primeiro.
                   </p>
                 </div>
-                <Link
-                  href="/chamados/novo"
-                  className={buttonVariants({
-                    className: "w-full bg-yellow-400 text-slate-950 shadow-sm hover:bg-yellow-300 sm:w-auto",
-                  })}
-                >
-                  <Plus className="size-4" />
-                  Novo chamado
-                </Link>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Link
+                    href="/chamados"
+                    className={buttonVariants({
+                      variant: "outline",
+                      className: "w-full border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10 sm:w-auto",
+                    })}
+                  >
+                    Ver fila
+                    <ArrowRight className="size-4" />
+                  </Link>
+                  <Link
+                    href="/chamados/novo"
+                    className={buttonVariants({
+                      className: "w-full bg-yellow-400 text-slate-950 shadow-sm hover:bg-yellow-300 sm:w-auto",
+                    })}
+                  >
+                    <Plus className="size-4" />
+                    Novo chamado
+                  </Link>
+                </div>
               </div>
 
               <div className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 <MetricCard icon={Ticket} label="Total" value={metrics.total} />
-                <MetricCard icon={Gauge} label="Conclusao" value={`${metrics.resolutionRate}%`} />
-                <MetricCard icon={ShieldAlert} label="Criticos" value={metrics.critical} />
+                <MetricCard icon={Gauge} label="Conclusao" value={`${metrics.resolutionRate}%`} helper="Resolvidos ou fechados" />
+                <MetricCard icon={ShieldAlert} label="Criticos" value={metrics.critical} helper="Prioridade maxima" />
                 <MetricCard icon={UserRoundX} label="Sem dono" value={metrics.unassigned} />
               </div>
             </div>
 
             <div className="border-t border-slate-200 bg-slate-50 p-6 dark:border-white/10 dark:bg-white/[0.03] xl:border-l xl:border-t-0">
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300">Distribuicao da fila</p>
+              <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Distribuicao da fila</p>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Status atual dos chamados carregados.</p>
               <div className="mt-5 space-y-4">
                 {statusCards.map((item) => (
                   <StatusMeter
@@ -190,13 +204,15 @@ function MetricCard({
   icon: Icon,
   label,
   value,
+  helper,
 }: {
   icon: typeof Ticket;
   label: string;
   value: number | string;
+  helper?: string;
 }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.04]">
+    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-slate-500 dark:text-slate-400">{label}</p>
         <div className="flex size-9 items-center justify-center rounded-md bg-yellow-400/15 text-yellow-700 dark:text-yellow-300">
@@ -204,6 +220,7 @@ function MetricCard({
         </div>
       </div>
       <p className="mt-4 text-3xl font-semibold tracking-tight">{value}</p>
+      {helper ? <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{helper}</p> : null}
     </div>
   );
 }

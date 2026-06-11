@@ -11,9 +11,9 @@ export const statusLabels: Record<TicketStatus, string> = {
 
 export const priorityLabels: Record<TicketPriority, string> = {
   low: "Baixa",
-  medium: "Média",
+  medium: "Media",
   high: "Alta",
-  critical: "Crítica",
+  critical: "Critica",
 };
 
 export const statusStyles: Record<TicketStatus, string> = {
@@ -38,7 +38,7 @@ export const statusIcons = {
 } satisfies Record<TicketStatus, typeof AlertCircle>;
 
 export function formatDate(value?: string) {
-  if (!value) return "Não informado";
+  if (!value) return "Nao informado";
   return new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "short",
     timeStyle: "short",

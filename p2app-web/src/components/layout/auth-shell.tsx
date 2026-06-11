@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ReactNode } from "react";
-import { Ticket } from "lucide-react";
+import { CheckCircle2, LockKeyhole, Ticket } from "lucide-react";
+
+import { branding } from "@/config/branding";
 
 export function AuthShell({
   title,
@@ -12,39 +14,95 @@ export function AuthShell({
   children: ReactNode;
 }) {
   return (
-    <main className="grid min-h-screen bg-[#07111F] text-white lg:grid-cols-[0.9fr_1.1fr]">
-      <section className="hidden border-r border-white/10 bg-[linear-gradient(135deg,#07111F,#0B1B2B_55%,#102A43)] p-10 lg:flex lg:flex-col lg:justify-between">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-lg bg-yellow-400 text-slate-950">
-            <Ticket className="size-5" />
-          </div>
-          <div>
-            <p className="text-lg font-semibold">P2App</p>
-            <p className="text-xs text-slate-400">Helpdesk técnico</p>
-          </div>
-        </Link>
-        <div>
-          <p className="mb-4 inline-flex rounded-full border border-yellow-300/30 bg-yellow-300/10 px-3 py-1 text-sm text-yellow-200">
-            Operação com JWT e perfis
+    <main
+      className="grid min-h-screen text-white lg:grid-cols-[0.88fr_1.12fr]"
+      style={{ backgroundColor: `var(--brand-bg-deep, #07111f)` }}
+    >
+      <section
+        className="hidden border-r border-white/10 p-10 lg:flex lg:flex-col lg:justify-between"
+        style={{
+          background: `linear-gradient(135deg, var(--brand-bg-deep, #07111f), var(--brand-bg-card, #0b1b2b) 58%, var(--brand-bg-accent, #12365b))`,
+        }}
+      >
+        <BrandLogo />
+
+        <div className="max-w-xl">
+          <p
+            className="mb-4 inline-flex rounded-full px-3 py-1 text-sm"
+            style={{
+              border: `1px solid color-mix(in srgb, var(--brand-accent) 30%, transparent)`,
+              color: `var(--brand-accent)`,
+            }}
+          >
+            {branding.authBadge}
           </p>
-          <h1 className="max-w-xl text-4xl font-semibold tracking-tight">
-            Controle chamados técnicos com uma interface rápida e profissional.
+          <h1 className="text-4xl font-semibold leading-tight tracking-tight">
+            {branding.heroTitle}
           </h1>
-          <p className="mt-4 max-w-lg text-slate-300">
-            Entre, acompanhe prioridades, atualize status e mantenha a fila de suporte organizada.
-          </p>
+          <p className="mt-4 text-slate-300">{branding.heroBody}</p>
+          <div className="mt-8 grid gap-3 text-sm text-slate-200">
+            {branding.trustItems.map((text) => (
+              <TrustItem key={text} text={text} />
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-white/10 bg-white/[0.06] p-4 text-sm text-slate-300">
+          <div className="mb-2 flex items-center gap-2" style={{ color: `var(--brand-accent)` }}>
+            <LockKeyhole className="size-4" />
+            {branding.demoLabel}
+          </div>
+          {branding.demoDescription}
         </div>
       </section>
-      <section className="flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md rounded-xl border border-white/10 bg-white p-6 text-slate-950 shadow-2xl dark:bg-[#0B1B2B] dark:text-white">
-          <div className="mb-6">
-            <p className="text-sm font-medium text-yellow-600 dark:text-yellow-300">P2App</p>
-            <h2 className="mt-2 text-2xl font-semibold">{title}</h2>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{description}</p>
+
+      <section className="flex items-center justify-center px-5 py-10 sm:px-6">
+        <div className="w-full max-w-md">
+          <Link href="/" className="mb-8 flex items-center justify-center gap-3 lg:hidden">
+            <BrandLogo />
+          </Link>
+
+          <div className="rounded-lg border border-white/10 bg-white p-6 text-slate-950 shadow-2xl shadow-black/25 dark:bg-[#0B1B2B] dark:text-white">
+            <div className="mb-6">
+              <p className="text-sm font-semibold" style={{ color: `var(--brand-accent)` }}>
+                Acesso seguro
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight">{title}</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">{description}</p>
+            </div>
+            {children}
           </div>
-          {children}
         </div>
       </section>
     </main>
+  );
+}
+
+function BrandLogo() {
+  return (
+    <Link href="/" className="flex items-center gap-3">
+      <div
+        className="flex size-10 items-center justify-center rounded-lg text-slate-950 shadow-lg"
+        style={{
+          backgroundColor: `var(--brand-accent)`,
+          boxShadow: `0 10px 15px -3px color-mix(in srgb, var(--brand-accent) 20%, transparent)`,
+        }}
+      >
+        <Ticket className="size-5" />
+      </div>
+      <div>
+        <p className="text-lg font-semibold">{branding.appName}</p>
+        <p className="text-xs text-slate-400">{branding.appTagline}</p>
+      </div>
+    </Link>
+  );
+}
+
+function TrustItem({ text }: { text: string }) {
+  return (
+    <div className="flex items-start gap-3 rounded-lg bg-white/[0.06] p-3 ring-1 ring-white/10">
+      <CheckCircle2 className="mt-0.5 size-4 shrink-0" style={{ color: `var(--brand-accent)` }} />
+      <span>{text}</span>
+    </div>
   );
 }

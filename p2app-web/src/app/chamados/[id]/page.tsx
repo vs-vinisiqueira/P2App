@@ -150,7 +150,7 @@ export default function ChamadoDetalhePage() {
                   ) : null}
                 </div>
                 <h2 className="break-words text-2xl font-semibold tracking-tight text-slate-950 dark:text-white">{ticket.title}</h2>
-                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Chamado #{ticket.id}</p>
+                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Chamado #{ticket.id} atualizado em {formatDate(ticket.updated_at)}</p>
               </div>
               <div className="grid min-w-0 gap-3 sm:grid-cols-3 lg:w-[520px]">
                 <HeroFact icon={Activity} label="Risco" value={getOperationalRisk(ticket)} />
@@ -170,10 +170,12 @@ export default function ChamadoDetalhePage() {
                   <div className="space-y-2">
                     <Label htmlFor="title">Titulo</Label>
                     <Input id="title" {...form.register("title")} />
+                    {form.formState.errors.title ? <p className="text-sm text-red-500">{form.formState.errors.title.message}</p> : null}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="description">Descricao</Label>
                     <Textarea id="description" rows={7} {...form.register("description")} />
+                    {form.formState.errors.description ? <p className="text-sm text-red-500">{form.formState.errors.description.message}</p> : null}
                   </div>
                   <div className="grid min-w-0 gap-4 md:grid-cols-3">
                     <div className="space-y-2">

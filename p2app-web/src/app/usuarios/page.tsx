@@ -24,18 +24,24 @@ export default function UsuariosPage() {
   return (
     <AppShell>
       {!canSeeUsers ? (
-        <Card className="border-yellow-300 bg-yellow-50 dark:border-yellow-400/30 dark:bg-yellow-400/10">
-          <CardContent className="flex items-center gap-3 p-6 text-yellow-900 dark:text-yellow-100">
-            <ShieldCheck className="size-5" />
-            A listagem de usuários exige perfil administrativo no backend.
+        <Card className="border-yellow-300 bg-yellow-50 shadow-sm dark:border-yellow-400/30 dark:bg-yellow-400/10">
+          <CardContent className="flex items-start gap-3 p-6 text-yellow-900 dark:text-yellow-100">
+            <ShieldCheck className="mt-0.5 size-5 shrink-0" />
+            <div>
+              <p className="font-medium">Acesso restrito</p>
+              <p className="mt-1 text-sm">A listagem de usuarios exige perfil administrativo no backend.</p>
+            </div>
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-slate-200 bg-white dark:border-white/10 dark:bg-[#0B1B2B]">
+        <Card className="border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#0B1B2B]">
           <CardHeader>
-            <div className="flex items-center gap-3">
-              <Users className="size-5 text-yellow-500" />
-              <CardTitle>Usuários cadastrados</CardTitle>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-3">
+                <Users className="size-5 text-yellow-600 dark:text-yellow-300" />
+                <CardTitle>Usuarios cadastrados</CardTitle>
+              </div>
+              <Badge variant="outline">{usersQuery.data?.length ?? 0} registros</Badge>
             </div>
           </CardHeader>
           <CardContent>
@@ -47,7 +53,7 @@ export default function UsuariosPage() {
               </div>
             ) : usersQuery.isError ? (
               <p className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
-                Não foi possível carregar usuários. Confirme se seu perfil possui role de administrador.
+                Nao foi possivel carregar usuarios. Confirme se seu perfil possui role de administrador.
               </p>
             ) : (
               <Table>

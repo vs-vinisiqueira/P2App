@@ -1,9 +1,9 @@
 import type { User } from "@/types/api";
 
-const TOKEN_KEY = "p2app_token";
-const USER_KEY = "p2app_user";
-const AUTH_CHANGED_EVENT = "p2app:auth-changed";
-const AUTH_CHANNEL = "p2app-auth";
+const TOKEN_KEY = process.env.NEXT_PUBLIC_AUTH_TOKEN_KEY || "app_token";
+const USER_KEY = process.env.NEXT_PUBLIC_AUTH_USER_KEY || "app_user";
+const AUTH_CHANGED_EVENT = process.env.NEXT_PUBLIC_AUTH_EVENT || "app:auth-changed";
+const AUTH_CHANNEL = process.env.NEXT_PUBLIC_AUTH_CHANNEL || "app-auth";
 
 function notifyAuthChanged() {
   if (typeof window === "undefined") return;

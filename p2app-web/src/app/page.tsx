@@ -3,6 +3,7 @@ import { ArrowRight, CheckCircle, LayoutDashboard, ShieldCheck, Ticket, Users } 
 
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { branding } from "@/config/branding";
 
 const benefits = [
   { title: "Gestão centralizada de chamados", icon: Ticket },
@@ -11,30 +12,49 @@ const benefits = [
   { title: "Organização por perfis de usuário", icon: Users },
 ];
 
+const previewTickets = [
+  { title: "VPN corporativa instável", priority: "Crítica", progress: 72 },
+  { title: "Notebook sem rede", priority: "Alta", progress: 54 },
+  { title: "Acesso ao sistema financeiro", priority: "Média", progress: 39 },
+];
+
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#07111F] text-white">
+    <main
+      className="min-h-screen text-white"
+      style={{ backgroundColor: `var(--brand-bg-deep, #07111f)` }}
+    >
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(250,204,21,0.16),transparent_30%),linear-gradient(135deg,#07111F_0%,#0B1B2B_55%,#102A43_100%)]" />
-        <div className="relative mx-auto grid min-h-[92vh] max-w-7xl items-center gap-12 px-6 py-20 lg:grid-cols-[1.05fr_0.95fr]">
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `radial-gradient(circle at top right, var(--brand-accent-glow, rgba(246,196,59,0.18)), transparent 30rem), linear-gradient(135deg, var(--brand-bg-deep, #07111f) 0%, var(--brand-bg-card, #0b1b2b) 55%, var(--brand-bg-accent, #12365b) 100%)`,
+          }}
+        />
+        <div className="relative mx-auto grid min-h-[92vh] max-w-7xl items-center gap-12 px-6 py-16 lg:grid-cols-[1.02fr_0.98fr]">
           <div>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-yellow-300/30 bg-yellow-300/10 px-3 py-1 text-sm text-yellow-200">
+            <div
+              className="mb-6 inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm"
+              style={{
+                border: `1px solid color-mix(in srgb, var(--brand-accent) 30%, transparent)`,
+                background: `color-mix(in srgb, var(--brand-accent) 10%, transparent)`,
+                color: `var(--brand-accent)`,
+              }}
+            >
               <LayoutDashboard className="size-4" />
-              Sistema SaaS para operação técnica
+              {branding.heroSubtitle}
             </div>
             <h1 className="max-w-3xl text-5xl font-semibold tracking-tight sm:text-6xl">
-              P2App
+              {branding.appName}
             </h1>
             <p className="mt-5 max-w-2xl text-xl leading-8 text-slate-300">
-              Sistema de gestão de chamados técnicos com autenticação JWT, controle de perfis e fluxo profissional para equipes de suporte.
+              {branding.appDescription}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/login"
-                className={buttonVariants({
-                  size: "lg",
-                  className: "bg-yellow-400 text-slate-950 hover:bg-yellow-300",
-                })}
+                className={buttonVariants({ size: "lg", className: "w-full sm:w-auto text-slate-950" })}
+                style={{ backgroundColor: `var(--brand-accent)` }}
               >
                 Entrar
                 <ArrowRight className="size-4" />
@@ -44,7 +64,7 @@ export default function Home() {
                 className={buttonVariants({
                   size: "lg",
                   variant: "outline",
-                  className: "border-white/20 bg-white/5 text-white hover:bg-white/10",
+                  className: "w-full border-white/20 bg-white/5 text-white hover:bg-white/10 sm:w-auto",
                 })}
               >
                 Criar conta
@@ -52,25 +72,48 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-black/30 backdrop-blur">
+          <div className="rounded-lg border border-white/10 bg-white/[0.05] p-5 shadow-2xl shadow-black/30 backdrop-blur">
             <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-4">
               <div>
                 <p className="text-sm text-slate-400">Fila técnica</p>
                 <p className="text-2xl font-semibold">Chamados em tempo real</p>
               </div>
-              <span className="rounded-full bg-yellow-400 px-3 py-1 text-xs font-semibold text-slate-950">P2</span>
+              <span
+                className="rounded-full px-3 py-1 text-xs font-semibold text-slate-950"
+                style={{ backgroundColor: `var(--brand-accent)` }}
+              >
+                {branding.appShortName}
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-3 pb-4 text-center text-sm">
+              <PreviewMetric label="Ativos" value="18" />
+              <PreviewMetric label="Críticos" value="3" />
+              <PreviewMetric label="SLA" value="87%" />
             </div>
             <div className="space-y-3">
-              {["VPN corporativa instável", "Notebook sem rede", "Acesso ao sistema financeiro"].map((title, index) => (
-                <div key={title} className="rounded-lg border border-white/10 bg-[#0B1B2B] p-4">
+              {previewTickets.map((ticket) => (
+                <div
+                  key={ticket.title}
+                  className="rounded-lg border border-white/10 p-4"
+                  style={{ backgroundColor: `var(--brand-bg-card, #0b1b2b)` }}
+                >
                   <div className="flex items-center justify-between gap-3">
-                    <p className="font-medium">{title}</p>
-                    <span className="rounded-md bg-yellow-400/15 px-2 py-1 text-xs text-yellow-200">
-                      {index === 0 ? "critical" : index === 1 ? "high" : "medium"}
+                    <p className="min-w-0 truncate font-medium">{ticket.title}</p>
+                    <span
+                      className="rounded-md px-2 py-1 text-xs"
+                      style={{
+                        background: `color-mix(in srgb, var(--brand-accent) 15%, transparent)`,
+                        color: `var(--brand-accent)`,
+                      }}
+                    >
+                      {ticket.priority}
                     </span>
                   </div>
                   <div className="mt-3 h-2 rounded-full bg-white/10">
-                    <div className="h-2 rounded-full bg-yellow-400" style={{ width: `${45 + index * 18}%` }} />
+                    <div
+                      className="h-2 rounded-full"
+                      style={{ width: `${ticket.progress}%`, backgroundColor: `var(--brand-accent)` }}
+                    />
                   </div>
                 </div>
               ))}
@@ -84,7 +127,7 @@ export default function Home() {
           {benefits.map((benefit) => (
             <Card key={benefit.title} className="border-white/10 bg-white/[0.04] text-white">
               <CardContent className="p-5">
-                <benefit.icon className="mb-4 size-6 text-yellow-300" />
+                <benefit.icon className="mb-4 size-6" style={{ color: `var(--brand-accent)` }} />
                 <p className="font-medium">{benefit.title}</p>
               </CardContent>
             </Card>
@@ -92,5 +135,14 @@ export default function Home() {
         </div>
       </section>
     </main>
+  );
+}
+
+function PreviewMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/[0.06] px-3 py-2">
+      <p className="text-xs text-slate-400">{label}</p>
+      <p className="mt-1 text-lg font-semibold">{value}</p>
+    </div>
   );
 }
