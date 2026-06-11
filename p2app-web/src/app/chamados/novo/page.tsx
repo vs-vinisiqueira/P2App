@@ -51,7 +51,7 @@ export default function NovoChamadoPage() {
       <div className="mx-auto grid min-w-0 max-w-6xl gap-6 xl:grid-cols-[1fr_360px]">
         <Card className="border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#0B1B2B]">
           <CardHeader>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Abertura de atendimento</p>
+            <p className="text-sm font-semibold text-yellow-700 dark:text-yellow-300">Abertura de atendimento</p>
             <CardTitle className="text-2xl">Novo chamado</CardTitle>
           </CardHeader>
           <CardContent>
@@ -73,6 +73,7 @@ export default function NovoChamadoPage() {
                 <Label htmlFor="description">Descricao</Label>
                 <Textarea id="description" rows={7} placeholder="Descreva o problema tecnico" {...form.register("description")} />
                 {form.formState.errors.description ? <p className="text-sm text-red-500">{form.formState.errors.description.message}</p> : null}
+                <p className="text-xs text-slate-500 dark:text-slate-400">Inclua impacto, tentativas feitas e quando o problema comecou.</p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
@@ -91,7 +92,7 @@ export default function NovoChamadoPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="category">Categoria</Label>
-                  <Input id="category" placeholder="infra" {...form.register("category")} />
+                  <Input id="category" placeholder="infra, acesso, hardware" {...form.register("category")} />
                 </div>
               </div>
               <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

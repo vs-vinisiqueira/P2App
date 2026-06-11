@@ -36,47 +36,47 @@ export default function RegisterPage() {
         senha: payload.senha,
       }),
     onSuccess: () => {
-      toast.success("Conta criada com sucesso. Faça login para continuar.");
+      toast.success("Conta criada com sucesso. Faca login para continuar.");
       router.push("/login");
     },
     onError: (error) => {
-      toast.error(getApiErrorMessage(error, "Não foi possível criar sua conta."));
+      toast.error(getApiErrorMessage(error, "Nao foi possivel criar sua conta."));
     },
   });
 
   return (
-    <AuthShell title="Criar conta" description="O cadastro público cria automaticamente um usuário cliente.">
+    <AuthShell title="Criar conta" description="O cadastro publico cria automaticamente um usuario cliente.">
       <form className="space-y-4" onSubmit={form.handleSubmit((data) => mutation.mutate(data))}>
         <div className="space-y-2">
           <Label htmlFor="nome">Nome</Label>
-          <Input id="nome" placeholder="Cliente Teste" {...form.register("nome")} />
+          <Input id="nome" placeholder="Cliente Teste" autoComplete="name" {...form.register("nome")} />
           {form.formState.errors.nome ? <p className="text-sm text-red-500">{form.formState.errors.nome.message}</p> : null}
         </div>
         <div className="space-y-2">
           <Label htmlFor="email">E-mail</Label>
-          <Input id="email" type="email" placeholder="cliente@example.com" {...form.register("email")} />
+          <Input id="email" type="email" placeholder="cliente@example.com" autoComplete="email" {...form.register("email")} />
           {form.formState.errors.email ? <p className="text-sm text-red-500">{form.formState.errors.email.message}</p> : null}
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="senha">Senha</Label>
-            <Input id="senha" type="password" {...form.register("senha")} />
+            <Input id="senha" type="password" autoComplete="new-password" {...form.register("senha")} />
             {form.formState.errors.senha ? <p className="text-sm text-red-500">{form.formState.errors.senha.message}</p> : null}
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirmarSenha">Confirmar senha</Label>
-            <Input id="confirmarSenha" type="password" {...form.register("confirmarSenha")} />
+            <Input id="confirmarSenha" type="password" autoComplete="new-password" {...form.register("confirmarSenha")} />
             {form.formState.errors.confirmarSenha ? (
               <p className="text-sm text-red-500">{form.formState.errors.confirmarSenha.message}</p>
             ) : null}
           </div>
         </div>
-        <Button type="submit" className="w-full bg-yellow-400 text-slate-950 hover:bg-yellow-300" disabled={mutation.isPending}>
+        <Button type="submit" className="h-9 w-full bg-yellow-400 text-slate-950 hover:bg-yellow-300" disabled={mutation.isPending}>
           {mutation.isPending ? "Criando..." : "Criar conta"}
         </Button>
       </form>
       <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
-        Já tem conta?{" "}
+        Ja tem conta?{" "}
         <Link href="/login" className="font-medium text-yellow-600 dark:text-yellow-300">
           Entrar
         </Link>

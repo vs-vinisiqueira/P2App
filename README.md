@@ -202,6 +202,31 @@ Remover containers e volume do banco:
 docker compose down -v
 ```
 
+## Deploy profissional em servidor local
+
+Para instalacao em uma empresa ou VM local, use os artefatos de producao:
+
+- `docker-compose.prod.yml`: stack com PostgreSQL, API, frontend Next.js e Nginx.
+- `.env.production.example`: modelo de variaveis para producao.
+- `deploy/nginx/p2app.conf`: proxy HTTP unico para frontend e API em `/api`.
+- `scripts/create_admin.py`: criacao ou atualizacao do admin inicial.
+- `scripts/backup_postgres.sh` e `scripts/restore_postgres.sh`: rotina operacional de backup e restore.
+
+Fluxo resumido no servidor:
+
+```bash
+cp .env.production.example .env.production
+# edite .env.production com senhas fortes e dominio/IP real
+docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+docker compose -f docker-compose.prod.yml --env-file .env.production exec api python scripts/create_admin.py
+```
+
+Runbook completo:
+
+```text
+docs/deploy-servidor-local.md
+```
+
 ## Testes automatizados
 
 A suite Pytest esta organizada em `tests/test_auth.py`, `tests/test_users.py` e `tests/test_tickets.py`. Os testes substituem a dependencia de banco da API e usam SQLite em memoria.

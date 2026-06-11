@@ -17,6 +17,7 @@ export function TicketStatusBadge({ status }: { status: TicketStatus }) {
 export function TicketPriorityBadge({ priority }: { priority: TicketPriority }) {
   return (
     <Badge variant="outline" className={cn("gap-1.5", priorityStyles[priority])}>
+      <span className="size-1.5 rounded-full bg-current opacity-70" />
       {priorityLabels[priority]}
     </Badge>
   );

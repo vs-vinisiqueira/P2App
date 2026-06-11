@@ -3,8 +3,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* --brand-* são injetados via layout.tsx a partir das env vars NEXT_PUBLIC_*.
+   Os valores abaixo são os padrões que entram em vigor se as vars não forem injetadas. */
 :root {
-  --background: #f1f5f9;
+  --background: #eef2f6;
   --foreground: #07111f;
   --card: #ffffff;
   --card-foreground: #07111f;
@@ -12,38 +14,38 @@
   --popover-foreground: #07111f;
   --primary: #0b1b2b;
   --primary-foreground: #ffffff;
-  --secondary: #e2e8f0;
+  --secondary: #e7edf3;
   --secondary-foreground: #102a43;
-  --muted: #e2e8f0;
-  --muted-foreground: #64748b;
-  --accent: #facc15;
+  --muted: #e7edf3;
+  --muted-foreground: #5f6f85;
+  --accent: var(--brand-accent, #f6c43b);
   --accent-foreground: #07111f;
   --destructive: #ef4444;
-  --border: #cbd5e1;
-  --input: #cbd5e1;
-  --ring: #facc15;
+  --border: #d3dde8;
+  --input: #cbd6e2;
+  --ring: var(--brand-accent, #f6c43b);
   --radius: 0.5rem;
 }
 
 .dark {
-  --background: #07111f;
+  --background: var(--brand-bg-deep, #07111f);
   --foreground: #f8fafc;
-  --card: #0b1b2b;
+  --card: var(--brand-bg-card, #0b1b2b);
   --card-foreground: #f8fafc;
-  --popover: #0b1b2b;
+  --popover: var(--brand-bg-card, #0b1b2b);
   --popover-foreground: #f8fafc;
-  --primary: #facc15;
-  --primary-foreground: #07111f;
+  --primary: var(--brand-accent, #facc15);
+  --primary-foreground: var(--brand-bg-deep, #07111f);
   --secondary: #102a43;
   --secondary-foreground: #f8fafc;
   --muted: #102a43;
   --muted-foreground: #94a3b8;
-  --accent: #facc15;
-  --accent-foreground: #07111f;
+  --accent: var(--brand-accent, #facc15);
+  --accent-foreground: var(--brand-bg-deep, #07111f);
   --destructive: #ef4444;
   --border: rgba(255, 255, 255, 0.12);
   --input: rgba(255, 255, 255, 0.14);
-  --ring: #fde047;
+  --ring: var(--brand-accent, #fde047);
 }
 
 @theme inline {
@@ -85,7 +87,22 @@ body {
 
 body {
   min-height: 100vh;
-  background: var(--background);
+  background:
+    radial-gradient(
+      circle at top left,
+      var(--brand-accent-glow, rgba(246, 196, 59, 0.16)),
+      transparent 28rem
+    ),
+    linear-gradient(180deg, #f8fafc 0%, var(--background) 34rem);
   color: var(--foreground);
   font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  font: inherit;
 }
