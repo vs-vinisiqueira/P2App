@@ -1,6 +1,7 @@
 # Ambiente virtual
 venv/
 .env
+.env.production
 
 # Python cache
 __pycache__/
