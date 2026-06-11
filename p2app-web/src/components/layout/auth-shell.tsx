@@ -58,9 +58,9 @@ export function AuthShell({
 
       <section className="flex items-center justify-center px-5 py-10 sm:px-6">
         <div className="w-full max-w-md">
-          <Link href="/" className="mb-8 flex items-center justify-center gap-3 lg:hidden">
+          <div className="mb-8 flex items-center justify-center gap-3 lg:hidden">
             <BrandLogo />
-          </Link>
+          </div>
 
           <div className="rounded-lg border border-white/10 bg-white p-6 text-slate-950 shadow-2xl shadow-black/25 dark:bg-[#0B1B2B] dark:text-white">
             <div className="mb-6">
