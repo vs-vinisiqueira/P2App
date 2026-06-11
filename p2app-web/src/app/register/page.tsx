@@ -46,7 +46,7 @@ export default function RegisterPage() {
 
   return (
     <AuthShell title="Criar conta" description="O cadastro publico cria automaticamente um usuario cliente.">
-      <form className="space-y-4" onSubmit={form.handleSubmit((data) => mutation.mutate(data))}>
+      <form method="post" className="space-y-4" onSubmit={form.handleSubmit((data) => mutation.mutate(data))}>
         <div className="space-y-2">
           <Label htmlFor="nome">Nome</Label>
           <Input id="nome" placeholder="Cliente Teste" autoComplete="name" {...form.register("nome")} />

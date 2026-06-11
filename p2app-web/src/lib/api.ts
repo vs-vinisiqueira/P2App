@@ -20,7 +20,12 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 && typeof window !== "undefined") {
+    // Um 401 vindo do proprio login significa "credenciais erradas", nao
+    // "sessao expirada" — entao nao limpamos a sessao nem redirecionamos.
+    const requestUrl = error.config?.url ?? "";
+    const isLoginRequest = requestUrl.includes("/auth/login");
+
+    if (error.response?.status === 401 && !isLoginRequest && typeof window !== "undefined") {
       clearAuth();
       if (window.location.pathname !== "/login") {
         window.location.href = "/login";

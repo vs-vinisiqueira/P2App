@@ -57,7 +57,7 @@ function LoginForm() {
 
   return (
     <AuthShell title="Entrar" description="Acesse sua area de chamados com seu e-mail e senha.">
-      <form className="space-y-4" onSubmit={form.handleSubmit((data) => mutation.mutate(data))}>
+      <form method="post" className="space-y-4" onSubmit={form.handleSubmit((data) => mutation.mutate(data))}>
         <div className="space-y-2">
           <Label htmlFor="email">E-mail</Label>
           <Input id="email" type="email" placeholder="cliente@example.com" autoComplete="email" {...form.register("email")} />
