@@ -2,6 +2,7 @@ import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.routes.atendimento import router as atendimento_router
 from app.routes.auth import router as auth_router
 from app.routes.chamado import router as chamado_router
 from app.routes.ticket import router as ticket_router
@@ -36,6 +37,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(chamado_router)
 app.include_router(ticket_router)
+app.include_router(atendimento_router)
 app.include_router(user_router)
 
 

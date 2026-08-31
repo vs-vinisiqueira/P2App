@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.core.deps import require_admin
-from app.models.user import User
-from app.database import get_db
-from app.schemas.user import UserCreate, UserPublicCreate, UserResponse
+from app.core.deps import require_support_staff
 from app.crud.user import criar_usuario, listar_usuarios
+from app.database import get_db
+from app.models.user import User
+from app.schemas.user import UserCreate, UserPublicCreate, UserResponse
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -33,7 +33,8 @@ def criar(user: UserPublicCreate, db: Session = Depends(get_db)):
 def listar(
     limit: int = Query(default=100, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
+    tipo_usuario: str | None = Query(default=None),
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_admin),
+    current_user: User = Depends(require_support_staff),
 ):
-    return listar_usuarios(db, limit=limit, offset=offset)
+    return listar_usuarios(db, limit=limit, offset=offset, tipo_usuario=tipo_usuario)

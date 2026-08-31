@@ -9,6 +9,8 @@ from app.database import Base
 from app.models import ticket_event  # noqa: F401
 from app.models import ticket  # noqa: F401
 from app.models import user  # noqa: F401
+from app.models import atendimento  # noqa: F401
+
 
 load_dotenv()
 

@@ -85,6 +85,8 @@ def criar(
         ),
         owner_id=current_user.id,
     )
+    db.commit()
+    db.refresh(ticket)
 
     return _to_chamado_response(ticket)
 
@@ -157,5 +159,7 @@ def atualizar_status(
         ticket=ticket,
         ticket_data=TicketUpdate(status=_STATUS_TO_TICKET[dados_status.status]),
     )
+    db.commit()
+    db.refresh(updated_ticket)
 
     return _to_chamado_response(updated_ticket)

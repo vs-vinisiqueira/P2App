@@ -3,7 +3,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-from app.core.authorization import is_admin
+from app.core.authorization import is_admin, is_support_staff
 from app.core.security import decodificar_access_token
 from app.crud.user import obter_usuario_por_email
 from app.database import get_db
@@ -44,6 +44,18 @@ def require_admin(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Acesso permitido apenas para administradores",
+        )
+
+    return current_user
+
+
+def require_support_staff(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    if not is_support_staff(current_user):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Acesso permitido apenas para administradores ou suporte",
         )
 
     return current_user

@@ -41,3 +41,9 @@ class Ticket(Base):
         cascade="all, delete-orphan",
         order_by="TicketEvent.created_at.asc(), TicketEvent.id.asc()",
     )
+    atendimentos = relationship(
+        "Atendimento",
+        back_populates="ticket",
+        cascade="all, delete-orphan",
+        order_by="Atendimento.created_at.asc(), Atendimento.id.asc()",
+    )

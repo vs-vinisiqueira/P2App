@@ -65,3 +65,17 @@ def test_admin_lista_usuarios(client: TestClient, admin_user, admin_auth_headers
 
     assert response.status_code == 200
     assert [user["email"] for user in response.json()] == [admin_user.email]
+
+
+def test_tecnico_lista_usuarios_com_filtro(
+    client: TestClient,
+    tecnico_user,
+    tecnico_auth_headers,
+    admin_user,
+) -> None:
+    response = client.get("/users/?tipo_usuario=tecnico", headers=tecnico_auth_headers)
+
+    assert response.status_code == 200
+    users = response.json()
+    assert len(users) == 1
+    assert users[0]["email"] == tecnico_user.email
