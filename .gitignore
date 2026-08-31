@@ -1,7 +1,11 @@
 # Ambiente virtual
 venv/
+.venv/
 .env
 .env.production
+
+# Cópia temporária usada para conferir o remoto
+.remote-check/
 
 # Python cache
 __pycache__/
