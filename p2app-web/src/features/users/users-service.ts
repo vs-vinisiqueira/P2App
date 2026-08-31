@@ -1,7 +1,9 @@
 import { api } from "@/lib/api";
-import type { User } from "@/types/api";
+import type { User, UserType } from "@/types/api";
 
-export async function listUsers() {
-  const { data } = await api.get<User[]>("/users/");
+export async function listUsers(tipoUsuario?: UserType | string) {
+  const { data } = await api.get<User[]>("/users/", {
+    params: tipoUsuario ? { tipo_usuario: tipoUsuario } : undefined,
+  });
   return data;
 }

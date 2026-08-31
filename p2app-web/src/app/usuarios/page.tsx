@@ -16,7 +16,7 @@ export default function UsuariosPage() {
   const canSeeUsers = isSupportUser(currentUser);
   const usersQuery = useQuery({
     queryKey: ["users"],
-    queryFn: listUsers,
+    queryFn: () => listUsers(),
     enabled: canSeeUsers,
     retry: false,
   });

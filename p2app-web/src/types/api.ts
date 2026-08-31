@@ -48,6 +48,7 @@ export type TicketCreateRequest = {
   description: string;
   priority?: TicketPriority;
   category?: string | null;
+  assigned_to_id?: number | null;
 };
 
 export type TicketUpdateRequest = Partial<{
@@ -72,4 +73,31 @@ export type TicketEvent = {
 
 export type TicketEventCreateRequest = {
   message: string;
+};
+
+export type AtendimentoStatus = "planejado" | "em_andamento" | "concluido" | "cancelado";
+
+export type Atendimento = {
+  id: number;
+  ticket_id: number;
+  tecnico_id: number;
+  descricao: string;
+  status: AtendimentoStatus;
+  data_inicio: string;
+  data_fim: string | null;
+  created_at: string;
+  updated_at: string;
+  tecnico?: User;
+};
+
+export type AtendimentoCreateRequest = {
+  descricao: string;
+  status?: AtendimentoStatus;
+  data_inicio?: string;
+};
+
+export type AtendimentoUpdateRequest = {
+  descricao?: string;
+  status?: AtendimentoStatus;
+  data_fim?: string;
 };
